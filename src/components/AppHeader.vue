@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useCabinStore } from '@/stores/cabin'
-import { openBackup } from '@/composables/ui'
+import { openBackup, openSettings } from '@/composables/ui'
 
 const store = useCabinStore()
 const keyword = ref('')
 watch(keyword, (v) => store.setSearch(v))
 
 function toggleTheme() {
-  const next = store.settings.theme === 'dark' ? 'light' : 'dark'
-  void store.patchSetting('theme', next)
+  void store.toggleTheme()
 }
 </script>
 
@@ -31,8 +30,9 @@ function toggleTheme() {
       <!-- 右侧操作 -->
       <div class="header-actions">
         <button class="icon-btn" title="切换主题" @click="toggleTheme">
-          {{ store.settings.theme === 'dark' ? '☀️' : '🌙' }}
+          {{ store.effectiveDark ? '☀️' : '🌙' }}
         </button>
+        <button class="icon-btn" title="设置" @click="openSettings()">⚙️</button>
         <button class="icon-btn" title="备份 / 恢复" @click="openBackup()">💾</button>
       </div>
     </div>

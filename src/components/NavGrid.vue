@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import { useCabinStore } from '@/stores/cabin'
 import { domainOf } from '@/core/navCore'
@@ -8,10 +8,32 @@ import type { NavSite } from '@/types/index'
 
 const store = useCabinStore()
 
-/** 分页显示（pageSize 可在设置中调整） */
+/* ---------- 分页 ---------- */
+const page = ref(1)
+watch(
+  () => [store.activeTabId, store.searchKeyword],
+  () => {
+    page.value = 1
+  },
+)
+watch(
+  () => store.settings.pageSize,
+  () => {
+    page.value = 1
+  },
+)
+
 const paged = computed(() => {
   const size = store.settings.pageSize
-  return { list: store.filteredSites.slice(0, size), hasMore: store.filteredSites.length > size }
+  const total = store.filteredSites.length
+  const totalPages = Math.max(1, Math.ceil(total / size))
+  const cur = Math.min(page.value, totalPages)
+  return {
+    list: store.filteredSites.slice((cur - 1) * size, cur * size),
+    cur,
+    totalPages,
+    total,
+  }
 })
 
 function openSite(site: NavSite) {
@@ -28,10 +50,30 @@ function onImgError(site: NavSite) {
   errored.add(site.id)
 }
 
+/* ---------- 拖拽排序（仅无搜索关键词时可用，作用于当前标签） ---------- */
+const dragId = ref('')
+const canDrag = computed(() => !store.searchKeyword.trim())
+
+function onDragStart(id: string) {
+  if (!canDrag.value) return
+  dragId.value = id
+}
+async function onDrop(targetId: string) {
+  const from = dragId.value
+  dragId.value = ''
+  if (!from || from === targetId) return
+  const ids = paged.value.list.map((s) => s.id)
+  const fromIdx = ids.indexOf(from)
+  const toIdx = ids.indexOf(targetId)
+  if (fromIdx < 0 || toIdx < 0) return
+  ids.splice(toIdx, 0, ids.splice(fromIdx, 1)[0])
+  await store.reorderSites(store.activeTabId, ids)
+}
+
 /** 右键快捷操作：选模式后编辑或删除 */
 async function onContext(site: NavSite) {
   const action: 'delete' | 'edit' | null = await ElMessageBox.confirm(
-    `${site.name}（${domainOf(site.url)}）`,
+    site.description ? `${site.name} — ${site.description}` : `${site.name}（${domainOf(site.url)}）`,
     '右键快捷操作：确认删除该网站？',
     {
       confirmButtonText: '删除',
@@ -59,8 +101,14 @@ async function onContext(site: NavSite) {
       :href="site.url"
       target="_blank"
       rel="noopener"
+      :draggable="canDrag"
+      :title="site.description || site.url"
       @click.prevent="openSite(site)"
       @contextmenu.prevent="onContext(site)"
+      @dragstart="onDragStart(site.id)"
+      @dragover.prevent
+      @drop="onDrop(site.id)"
+      @dragend="dragId = ''"
     >
       <div class="favicon">
         <img
@@ -83,9 +131,17 @@ async function onContext(site: NavSite) {
     </button>
   </div>
 
-  <div v-if="paged.hasMore" class="more-tip">
-    共 {{ store.filteredSites.length }} 个，当前显示前 {{ store.settings.pageSize }} 个（可在备份弹窗中调整每页数量）
+  <!-- 翻页 -->
+  <div v-if="paged.totalPages > 1" class="pager">
+    <el-pagination
+      v-model:current-page="page"
+      :page-size="store.settings.pageSize"
+      :total="paged.total"
+      layout="prev, pager, next, total"
+      background
+    />
   </div>
+  <div v-else-if="paged.total === 0" class="empty-tip">暂无网站，点击下方“添加网站”或右上角“批量导入”开始</div>
 </template>
 
 <style scoped>
@@ -110,6 +166,9 @@ async function onContext(site: NavSite) {
   text-decoration: none;
   min-height: 150px;
   color: var(--c-text);
+}
+.site-card:active {
+  cursor: grabbing;
 }
 .nav-grid.as-list .site-card {
   flex-direction: row;
@@ -188,10 +247,15 @@ async function onContext(site: NavSite) {
   min-height: 52px;
   flex-direction: row;
 }
-.more-tip {
-  margin-top: 18px;
+.pager {
+  display: flex;
+  justify-content: center;
+  margin-top: 22px;
+}
+.empty-tip {
   text-align: center;
   color: var(--c-text-dim);
-  font-size: 12px;
+  padding: 48px 0;
+  font-size: 14px;
 }
 </style>

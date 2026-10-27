@@ -34,6 +34,7 @@ export const useCabinStore = defineStore('cabin', {
     activeTabId: '',
     searchKeyword: '',
     activeFilterTabId: '', // 空串 = 全部
+    systemDark: true, // 跟随系统的暗色状态（init 时挂 matchMedia 监听）
   }),
 
   getters: {
@@ -58,6 +59,10 @@ export const useCabinStore = defineStore('cabin', {
     totalClicks(state): number {
       return state.sites.reduce((sum, s) => sum + s.clickCount, 0)
     },
+    /** 实际生效的暗色状态（跟随系统时取系统值） */
+    effectiveDark(state): boolean {
+      return state.settings.themeFollowSystem ? state.systemDark : state.settings.theme === 'dark'
+    },
   },
 
   actions: {
@@ -70,6 +75,12 @@ export const useCabinStore = defineStore('cabin', {
       this.settings = loadSettings(this.db)
       const defTab = this.visibleTabs.find((t) => t.isDefault)
       this.activeTabId = defTab?.id ?? this.visibleTabs[0]?.id ?? ''
+      // 系统主题变化监听（跟随系统时实时切换）
+      const mq = window.matchMedia('(prefers-color-scheme: dark)')
+      this.systemDark = mq.matches
+      mq.addEventListener('change', (e) => {
+        this.systemDark = e.matches
+      })
       installBeforeUnload()
       this.ready = true
     },
@@ -130,6 +141,19 @@ export const useCabinStore = defineStore('cabin', {
         this.activeTabId = this.visibleTabs[0]?.id ?? ''
       }
       this.sites = loadSites(db)
+    },
+    /** 级联删除：标签及其下全部网站（墓碑软删除） */
+    async removeTabCascade(tabId: string): Promise<void> {
+      const db = this.getDbOrThrow()
+      this.sites
+        .filter((s) => s.tabId === tabId && !s.isDeleted)
+        .forEach((s) => softDeleteSite(db, s.id, Date.now()))
+      softDeleteTab(db, tabId, Date.now())
+      this.tabs = loadTabs(db)
+      this.sites = loadSites(db)
+      if (this.activeTabId === tabId) {
+        this.activeTabId = this.visibleTabs[0]?.id ?? ''
+      }
     },
     async reorderTabs(tabIds: string[]): Promise<void> {
       const db = this.getDbOrThrow()
@@ -199,6 +223,12 @@ export const useCabinStore = defineStore('cabin', {
       const db = this.getDbOrThrow()
       ;(this.settings as unknown as Record<string, unknown>)[key as string] = value
       saveSetting(db, key as string, String(value))
+    },
+    /** 切换主题（关闭“跟随系统”，显式切暗/亮） */
+    async toggleTheme(): Promise<void> {
+      const next = this.settings.theme === 'dark' ? 'light' : 'dark'
+      await this.patchSetting('themeFollowSystem', false)
+      await this.patchSetting('theme', next)
     },
 
     /** ---------- 备份导出 / 导入恢复 ---------- */

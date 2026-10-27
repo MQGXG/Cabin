@@ -140,7 +140,7 @@ function applySetting(settings: AppSettings, key: string, value: string): void {
       if (value === 'dark' || value === 'light') settings.theme = value
       break
     case 'themeFollowSystem':
-      settings.themeFollowSystem = value === '1'
+      settings.themeFollowSystem = value === '1' || value === 'true'
       break
     case 'layout':
       if (value === 'grid' || value === 'list') settings.layout = value

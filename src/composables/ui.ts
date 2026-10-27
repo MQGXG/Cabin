@@ -11,6 +11,7 @@ interface UiState {
   tabEditing: NavTab | null
   importOpen: boolean
   backupOpen: boolean
+  settingsOpen: boolean
   wallpaperOpen: boolean
 }
 
@@ -21,6 +22,7 @@ export const ui = reactive<UiState>({
   tabEditing: null,
   importOpen: false,
   backupOpen: false,
+  settingsOpen: false,
   wallpaperOpen: false,
 })
 
@@ -45,4 +47,7 @@ export function openImport() {
 }
 export function openBackup() {
   ui.backupOpen = true
+}
+export function openSettings() {
+  ui.settingsOpen = true
 }

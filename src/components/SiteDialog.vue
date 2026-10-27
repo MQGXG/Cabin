@@ -91,6 +91,9 @@ async function submit() {
           style="margin-top: 8px"
         />
       </el-form-item>
+      <el-form-item v-else label="图标">
+        <el-input v-model="form.favicon" placeholder="自定义图标 URL（留空显示首字母）" />
+      </el-form-item>
     </el-form>
     <template #footer>
       <el-button @click="ui.siteDialogOpen = false">取消</el-button>

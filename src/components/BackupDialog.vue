@@ -6,13 +6,11 @@ import { ui } from '@/composables/ui'
 
 const store = useCabinStore()
 const replaceMode = ref(false)
-const pageSize = ref(18)
 
 watch(
   () => ui.backupOpen,
   (open) => {
     if (!open) return
-    pageSize.value = store.settings.pageSize
     replaceMode.value = false
   },
 )
@@ -36,11 +34,6 @@ async function onImportFile(e: Event) {
   ElMessage.success(`恢复完成：新增 ${res.sitesAdded} 个网站，跳过 ${res.sitesSkipped} 个重复`)
   input.value = ''
 }
-
-async function onPageSizeChange(v: number) {
-  await store.patchSetting('pageSize', Number(v) || 18)
-  ElMessage.success('已保存')
-}
 </script>
 
 <template>
@@ -58,9 +51,6 @@ async function onPageSizeChange(v: number) {
           <input type="file" accept=".json" @change="onImportFile" />
         </div>
         <div class="hint">默认合并模式：按域名去重后新增；勾选后为整库替换（危险）。</div>
-      </el-form-item>
-      <el-form-item label="每页显示网站数">
-        <el-input-number v-model="pageSize" :min="6" :max="200" :step="6" @change="onPageSizeChange" />
       </el-form-item>
     </el-form>
     <template #footer>

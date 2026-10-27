@@ -10,6 +10,7 @@ import TabDialog from '@/components/TabDialog.vue'
 import SiteDialog from '@/components/SiteDialog.vue'
 import ImportDialog from '@/components/ImportDialog.vue'
 import BackupDialog from '@/components/BackupDialog.vue'
+import SettingsDialog from '@/components/SettingsDialog.vue'
 
 const store = useCabinStore()
 
@@ -17,10 +18,10 @@ onMounted(async () => {
   await store.init()
 })
 
-// 主题切换（防闪烁：theme-init 在 index.html 中先于应用执行）
+// 主题切换（防闪烁：跟随系统时实时跟随 matchMedia 变化）
 watchEffect(() => {
   if (!store.ready) return
-  document.documentElement.classList.toggle('theme-light', store.settings.theme === 'light')
+  document.documentElement.classList.toggle('theme-light', !store.effectiveDark)
 })
 </script>
 
@@ -38,6 +39,7 @@ watchEffect(() => {
     <SiteDialog />
     <ImportDialog />
     <BackupDialog />
+    <SettingsDialog />
   </div>
 </template>
 
