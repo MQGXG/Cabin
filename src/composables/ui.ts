@@ -7,6 +7,7 @@ import type { NavSite, NavTab } from '@/types'
 interface UiState {
   siteDialogOpen: boolean
   siteEditing: NavSite | null // null = 新增
+  siteDefaultTabId: string // 新增时指定标签（分区布局的“+”入口）
   tabDialogOpen: boolean
   tabEditing: NavTab | null
   importOpen: boolean
@@ -18,6 +19,7 @@ interface UiState {
 export const ui = reactive<UiState>({
   siteDialogOpen: false,
   siteEditing: null,
+  siteDefaultTabId: '',
   tabDialogOpen: false,
   tabEditing: null,
   importOpen: false,
@@ -26,8 +28,9 @@ export const ui = reactive<UiState>({
   wallpaperOpen: false,
 })
 
-export function openAddSite() {
+export function openAddSite(tabId = '') {
   ui.siteEditing = null
+  ui.siteDefaultTabId = tabId
   ui.siteDialogOpen = true
 }
 export function openEditSite(site: NavSite) {

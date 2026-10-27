@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Pencil, Star, Trash2 } from 'lucide-vue-next'
 import { useCabinStore } from '@/stores/cabin'
 import { openEditTab } from '@/composables/ui'
 import type { NavTab } from '@/types'
@@ -99,9 +100,9 @@ function onDrop(i: number) {
       :style="{ left: menu.x + 'px', top: menu.y + 'px' }"
       @click.stop
     >
-      <div class="ctx-item" @click="menuEdit">✏️ 编辑标签</div>
-      <div v-if="!menu.tab.isDefault" class="ctx-item" @click="menuSetDefault">⭐ 设为默认标签</div>
-      <div class="ctx-item danger" @click="menuDelete">🗑️ 删除标签</div>
+      <div class="ctx-item" @click="menuEdit"><Pencil :size="13" /> 编辑标签</div>
+      <div v-if="!menu.tab.isDefault" class="ctx-item" @click="menuSetDefault"><Star :size="13" /> 设为默认标签</div>
+      <div class="ctx-item danger" @click="menuDelete"><Trash2 :size="13" /> 删除标签</div>
     </div>
   </Teleport>
 </template>
@@ -159,6 +160,9 @@ html.theme-light .tab-context-menu {
   border-color: rgba(30, 40, 70, 0.12);
 }
 .tab-context-menu .ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 8px 12px;
   border-radius: 7px;
   color: #e6eaf5;

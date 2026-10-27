@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { Search, Plus, Sun, Moon, Settings, DatabaseBackup } from 'lucide-vue-next'
 import { useCabinStore } from '@/stores/cabin'
 import { openBackup, openSettings, openAddSite } from '@/composables/ui'
 
@@ -23,18 +24,19 @@ function toggleTheme() {
 
       <!-- 顶部搜索 -->
       <div class="search-wrap">
-        <span class="search-icon">🔍</span>
+        <Search :size="15" class="search-icon" />
         <input v-model="keyword" class="search-input" type="text" placeholder="搜索导航..." />
       </div>
 
       <!-- 右侧操作 -->
       <div class="header-actions">
-        <button class="icon-btn primary" title="添加网站" @click="openAddSite()">+</button>
+        <button class="icon-btn primary" title="添加网站" @click="openAddSite()"><Plus :size="18" :stroke-width="2.6" /></button>
         <button class="icon-btn" title="切换主题" @click="toggleTheme">
-          {{ store.effectiveDark ? '☀️' : '🌙' }}
+          <Sun v-if="store.effectiveDark" :size="17" />
+          <Moon v-else :size="17" />
         </button>
-        <button class="icon-btn" title="设置" @click="openSettings()">⚙️</button>
-        <button class="icon-btn" title="备份 / 恢复" @click="openBackup()">💾</button>
+        <button class="icon-btn" title="设置" @click="openSettings()"><Settings :size="17" /></button>
+        <button class="icon-btn" title="备份 / 恢复" @click="openBackup()"><DatabaseBackup :size="17" /></button>
       </div>
     </div>
   </header>

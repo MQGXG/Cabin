@@ -26,7 +26,17 @@ watch(
       }
       autoIcon.value = !!ui.siteEditing.favicon
     } else {
-      form.value = { name: '', url: '', description: '', favicon: '', tabId: store.activeTabId || store.visibleTabs[0]?.id || '' }
+      form.value = {
+        name: '',
+        url: '',
+        description: '',
+        favicon: '',
+        tabId:
+          ui.siteDefaultTabId ||
+          store.activeTabId ||
+          store.visibleTabs[0]?.id ||
+          '',
+      }
       autoIcon.value = true
     }
   },

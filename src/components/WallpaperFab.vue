@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { ImageIcon, Eraser } from 'lucide-vue-next'
 import { useCabinStore } from '@/stores/cabin'
 import { ui } from '@/composables/ui'
 
@@ -74,7 +75,7 @@ function clearWallpaper() {
 
 <template>
   <!-- 悬浮按钮（右下角，对应截图） -->
-  <button class="wall-fab" title="壁纸" @click="ui.wallpaperOpen = true">🖼️</button>
+  <button class="wall-fab" title="壁纸" @click="ui.wallpaperOpen = true"><ImageIcon :size="18" /></button>
 
   <!-- 壁纸背景层（始终渲染，无壁纸时提供默认底色 var(--c-bg)） -->
   <div class="wall-bg" :style="bgStyle" />
@@ -102,7 +103,9 @@ function clearWallpaper() {
         <div class="custom-row">
           <input type="file" accept="image/*" @change="onCustomPick" />
           <span v-if="store.settings.wallpaperType === 'custom'" class="custom-name">当前：{{ customName || '已选图片' }}</span>
-          <el-button v-if="store.settings.wallpaperType !== 'none'" size="small" @click="clearWallpaper">清除壁纸</el-button>
+          <el-button v-if="store.settings.wallpaperType !== 'none'" size="small" @click="clearWallpaper">
+            <Eraser :size="12" class="mr-1" /> 清除壁纸
+          </el-button>
         </div>
       </el-form-item>
       <el-form-item :label="`遮罩透明度（${overlay}%）`">

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { Search, Plus, Upload, LayoutGrid, Columns3 } from 'lucide-vue-next'
 import { useCabinStore } from '@/stores/cabin'
 import { openCreateTab, openImport } from '@/composables/ui'
 
 const store = useCabinStore()
 
-/** 区级筛选：跟随激活标签（对应截图 [常用] 徽标） */
+/** 区级筛选：跟随激活标签 */
 watch(
   () => store.activeTabId,
   () => store.setFilterTab(''),
@@ -24,46 +25,43 @@ function toggleLayout() {
   <div class="stats-bar cabin-card">
     <div class="left">
       <span class="stat">{{ store.filteredSites.length }} 个网站</span>
-      <span class="divider">|</span>
-      <span class="stat">{{ store.totalClicks }} 总点击</span>
-      <span class="divider">|</span>
-      <span class="filter-badge">
+      <span class="divider" />
+      <span class="stat accent">{{ store.totalClicks }} 总点击</span>
+      <span class="divider" />
+      <span class="filter-badge" title="点击显示全部标签的网站" @click="store.setFilterTab(store.activeFilterTabId ? '' : store.activeTabId)">
         <span class="badge-icon">📂</span>
         {{ store.activeTab?.name ?? '全部' }}
       </span>
       <div class="search-box">
-        <span class="search-icon">🔍</span>
+        <Search :size="14" class="search-icon" />
         <input v-model="keyword" type="text" placeholder="搜索网站..." />
       </div>
     </div>
     <div class="right">
       <button class="action-btn" @click="openCreateTab()">
-        <span class="plus">+</span> 创建标签
+        <Plus :size="14" /> 创建标签
       </button>
-      <button class="action-btn" @click="openImport()">📥 批量导入</button>
-      <button class="layout-btn" title="切换布局" @click="toggleLayout">
-        <!-- 网格布局图标 -->
-        <svg
+      <button class="action-btn" @click="openImport()">
+        <Upload :size="14" /> 批量导入
+      </button>
+      <div class="layout-btn" title="切换布局">
+        <button
           class="layout-ic"
           :class="{ active: store.settings.layout === 'grid' }"
-          width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"
+          title="卡片布局"
+          @click="toggleLayout()"
         >
-          <rect x="1" y="1" width="6" height="6" rx="1.4" />
-          <rect x="9" y="1" width="6" height="6" rx="1.4" />
-          <rect x="1" y="9" width="6" height="6" rx="1.4" />
-          <rect x="9" y="9" width="6" height="6" rx="1.4" />
-        </svg>
-        <!-- 分区布局图标 -->
-        <svg
+          <LayoutGrid :size="15" />
+        </button>
+        <button
           class="layout-ic"
           :class="{ active: store.settings.layout === 'section' }"
-          width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"
+          title="分区布局"
+          @click="toggleLayout()"
         >
-          <rect x="1" y="1.5" width="14" height="3" rx="1.2" />
-          <rect x="1" y="7" width="6" height="7.5" rx="1.4" />
-          <rect x="9" y="7" width="6" height="7.5" rx="1.4" />
-        </svg>
-      </button>
+          <Columns3 :size="15" />
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -89,8 +87,13 @@ function toggleLayout() {
   color: var(--c-text);
   font-weight: 600;
 }
+.stat.accent {
+  color: var(--c-primary);
+}
 .divider {
-  color: var(--c-border);
+  width: 1px;
+  height: 16px;
+  background: var(--c-border);
 }
 .filter-badge {
   display: inline-flex;
@@ -101,24 +104,37 @@ function toggleLayout() {
   border-radius: 8px;
   padding: 4px 10px;
   font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
+  transition: filter 0.15s;
+}
+.filter-badge:hover {
+  filter: brightness(1.15);
+}
+.badge-icon {
+  font-size: 12px;
 }
 .search-box {
   display: flex;
   align-items: center;
+  gap: 7px;
   background: var(--c-bg);
   border: 1px solid var(--c-border);
   border-radius: 10px;
   padding: 7px 12px;
   min-width: 220px;
+  transition: border-color 0.2s;
+}
+.search-box:focus-within {
+  border-color: var(--c-primary);
 }
 .search-icon {
   color: var(--c-text-dim);
-  margin-right: 8px;
-  font-size: 13px;
+  flex-shrink: 0;
 }
 .search-box input {
   flex: 1;
+  min-width: 0;
   background: transparent;
   border: none;
   outline: none;
@@ -134,25 +150,23 @@ function toggleLayout() {
   gap: 10px;
 }
 .action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: var(--c-bg-soft);
   border: 1px solid var(--c-border);
   color: var(--c-text);
   border-radius: 10px;
   padding: 8px 14px;
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 .action-btn:hover {
   border-color: var(--c-primary);
   color: var(--c-primary);
   background: var(--c-primary-soft);
-}
-.plus {
-  font-weight: 700;
 }
 .layout-btn {
   display: flex;
@@ -165,12 +179,19 @@ function toggleLayout() {
   padding: 2px;
 }
 .layout-ic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 6px 9px;
-  box-sizing: content-box;
-  cursor: pointer;
-  color: var(--c-text-dim);
+  border: none;
   border-radius: 8px;
+  background: transparent;
+  color: var(--c-text-dim);
+  cursor: pointer;
   transition: all 0.2s;
+}
+.layout-ic:hover {
+  color: var(--c-text);
 }
 .layout-ic.active {
   background: var(--c-primary-soft);
