@@ -7,6 +7,9 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# 本地诊断脚本与截图（Playwright 排查用，不入库）
+scripts/diag-carefree/
+
 node_modules
 dist
 dist-ssr
