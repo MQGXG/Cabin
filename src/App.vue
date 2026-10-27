@@ -46,8 +46,9 @@ watchEffect(() => {
 <style scoped>
 .app-shell {
   min-height: 100%;
-  background: var(--c-bg);
-  transition: background 0.25s;
+  /* 背景交给壁纸层（.wall-bg，默认 var(--c-bg)）；
+     此处若保留不透明背景，会因普通块背景绘制在负 z-index 壁纸层之上而将其完全遮挡 */
+  background: transparent;
 }
 .app-main {
   max-width: 1720px;

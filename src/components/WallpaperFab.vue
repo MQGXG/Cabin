@@ -76,8 +76,8 @@ function clearWallpaper() {
   <!-- 悬浮按钮（右下角，对应截图） -->
   <button class="wall-fab" title="壁纸" @click="ui.wallpaperOpen = true">🖼️</button>
 
-  <!-- 壁纸背景层（跟随设置渲染） -->
-  <div v-if="store.settings.wallpaperType !== 'none'" class="wall-bg" :style="bgStyle" />
+  <!-- 壁纸背景层（始终渲染，无壁纸时提供默认底色 var(--c-bg)） -->
+  <div class="wall-bg" :style="bgStyle" />
   <div class="wall-overlay" :style="{ opacity: store.settings.wallpaperType === 'none' ? 1 : Math.min(1, store.settings.wallpaperOverlay / 100 + 0.15) }" />
 
   <el-dialog v-model="ui.wallpaperOpen" title="壁纸设置" width="560px" append-to-body>
@@ -87,6 +87,7 @@ function clearWallpaper() {
           <button
             v-for="(p, i) in PRESETS"
             :key="p.name"
+            type="button"
             class="preset-cell"
             :class="{ picked: selectedPreset === i, 'no-pick': !p.css }"
             @click="pickPreset(i)"
@@ -138,6 +139,8 @@ function clearWallpaper() {
   position: fixed;
   inset: 0;
   z-index: -2;
+  /* 默认底色（无壁纸时）；有壁纸时被 bgStyle 的 background 覆盖 */
+  background: var(--c-bg);
 }
 .wall-overlay {
   position: fixed;
