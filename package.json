@@ -1,0 +1,34 @@
+{
+  "name": "cabin",
+  "version": "1.0.0",
+  "description": "Cabin — 离线个人导航起始页（Vue3 + TS + 浏览器内 SQLite，数据全存本地浏览器）",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc -b",
+    "test:nav": "node --experimental-strip-types scripts/test-nav-core.ts",
+    "test:import": "node --experimental-strip-types scripts/test-import-core.ts",
+    "test:backup": "node --experimental-strip-types scripts/test-backup-core.ts",
+    "test": "npm run test:nav && npm run test:import && npm run test:backup"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
+    "element-plus": "^2.14.7",
+    "pinia": "^4.1.0",
+    "sql.js": "^1.15.1",
+    "vue": "^3.5.44"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^24.19.2",
+    "@types/sql.js": "^1.4.11",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vue/tsconfig": "^0.9.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.4",
+    "vue-tsc": "^3.3.13"
+  }
+}
