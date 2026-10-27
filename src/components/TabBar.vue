@@ -4,6 +4,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Pencil, Star, Trash2 } from 'lucide-vue-next'
 import { useCabinStore } from '@/stores/cabin'
 import { openEditTab } from '@/composables/ui'
+import AppIcon from '@/components/AppIcon.vue'
 import type { NavTab } from '@/types'
 
 const store = useCabinStore()
@@ -86,7 +87,7 @@ function onDrop(i: number) {
         @drop="onDrop(i)"
         @dragend="dragIndex = -1"
       >
-        <span class="tab-icon">{{ tab.icon }}</span>{{ tab.name }}
+        <AppIcon class="tab-icon" :name="tab.icon" :size="14" />{{ tab.name }}
         <span v-if="tab.isDefault" class="default-mark" title="默认标签">●</span>
       </span>
     </div>

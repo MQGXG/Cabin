@@ -14,6 +14,8 @@ interface UiState {
   backupOpen: boolean
   settingsOpen: boolean
   wallpaperOpen: boolean
+  /** 分区详情右侧面板（null = 关闭） */
+  sectionPanelTabId: string
 }
 
 export const ui = reactive<UiState>({
@@ -26,6 +28,7 @@ export const ui = reactive<UiState>({
   backupOpen: false,
   settingsOpen: false,
   wallpaperOpen: false,
+  sectionPanelTabId: '',
 })
 
 export function openAddSite(tabId = '') {
@@ -53,4 +56,8 @@ export function openBackup() {
 }
 export function openSettings() {
   ui.settingsOpen = true
+}
+/** 打开分区详情右侧面板 */
+export function openSectionPanel(tabId: string) {
+  ui.sectionPanelTabId = tabId
 }

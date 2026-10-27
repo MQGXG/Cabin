@@ -11,6 +11,7 @@ import SiteDialog from '@/components/SiteDialog.vue'
 import ImportDialog from '@/components/ImportDialog.vue'
 import BackupDialog from '@/components/BackupDialog.vue'
 import SettingsDialog from '@/components/SettingsDialog.vue'
+import SectionPanel from '@/components/SectionPanel.vue'
 
 const store = useCabinStore()
 
@@ -40,6 +41,7 @@ watchEffect(() => {
     <ImportDialog />
     <BackupDialog />
     <SettingsDialog />
+    <SectionPanel />
   </div>
 </template>
 

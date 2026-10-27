@@ -175,12 +175,12 @@ export function seedIfNeeded(db: Database, now = Date.now()): boolean {
   stmt.free()
   if (count > 0) return false
 
-  // 默认标签：常用 / 工具 / 学习 / 娱乐
+  // 默认标签：常用 / 工具 / 学习 / 娱乐（统一 lucide 矢量图标）
   const defaults: Array<{ name: string; slug: string; icon: string }> = [
-    { name: '常用', slug: 'common', icon: '⭐' },
-    { name: '工具', slug: 'tools', icon: '🛠️' },
-    { name: '学习', slug: 'learn', icon: '📚' },
-    { name: '娱乐', slug: 'fun', icon: '🎮' },
+    { name: '常用', slug: 'common', icon: 'lucide:Star' },
+    { name: '工具', slug: 'tools', icon: 'lucide:Wrench' },
+    { name: '学习', slug: 'learn', icon: 'lucide:BookOpen' },
+    { name: '娱乐', slug: 'fun', icon: 'lucide:Gamepad2' },
   ]
   defaults.forEach((d, i) => {
     insertTab(db, {

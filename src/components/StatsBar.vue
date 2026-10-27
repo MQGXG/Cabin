@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Search, Plus, Upload, LayoutGrid, Columns3 } from 'lucide-vue-next'
+import { Search, Plus, Upload, LayoutGrid, Columns3, Folder } from 'lucide-vue-next'
 import { useCabinStore } from '@/stores/cabin'
 import { openCreateTab, openImport } from '@/composables/ui'
 
@@ -29,7 +29,7 @@ function toggleLayout() {
       <span class="stat accent">{{ store.totalClicks }} 总点击</span>
       <span class="divider" />
       <span class="filter-badge" title="点击显示全部标签的网站" @click="store.setFilterTab(store.activeFilterTabId ? '' : store.activeTabId)">
-        <span class="badge-icon">📂</span>
+        <Folder :size="13" />
         {{ store.activeTab?.name ?? '全部' }}
       </span>
       <div class="search-box">
@@ -110,9 +110,6 @@ function toggleLayout() {
 }
 .filter-badge:hover {
   filter: brightness(1.15);
-}
-.badge-icon {
-  font-size: 12px;
 }
 .search-box {
   display: flex;

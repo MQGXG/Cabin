@@ -5,6 +5,7 @@ import { Bookmark, FileSpreadsheet, FileUp } from 'lucide-vue-next'
 import { useCabinStore } from '@/stores/cabin'
 import { ui } from '@/composables/ui'
 import { parseBookmarksHtml, parseCsv } from '@/core/importCore'
+import AppIcon from '@/components/AppIcon.vue'
 import type { CsvSiteRow } from '@/types'
 
 const store = useCabinStore()
@@ -102,7 +103,9 @@ async function submit() {
       <Bookmark :size="15" />
       <span>导入到标签：</span>
       <el-select v-model="targetTabId" size="small" class="target-select">
-        <el-option v-for="t in store.visibleTabs" :key="t.id" :label="`${t.icon} ${t.name}`" :value="t.id" />
+        <el-option v-for="t in store.visibleTabs" :key="t.id" :value="t.id">
+          <span class="tab-option"><AppIcon :name="t.icon" :size="14" /> {{ t.name }}</span>
+        </el-option>
       </el-select>
     </div>
 
@@ -256,6 +259,11 @@ async function submit() {
 }
 .hidden-input {
   display: none;
+}
+.tab-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 /* 已选文件提示 */
 .file-chip {

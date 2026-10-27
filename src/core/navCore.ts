@@ -4,12 +4,12 @@
  */
 import type { NavTab, NavSite, CreateTabRequest, UpdateTabRequest, CreateSiteRequest, UpdateSiteRequest } from '../types'
 
-/** 默认标签定义（首次启动种子数据） */
+/** 默认标签定义（首次启动种子数据，统一 lucide 矢量图标） */
 export const DEFAULT_TABS: Array<Pick<NavTab, 'name' | 'slug' | 'icon'>> = [
-  { name: '常用', slug: 'common', icon: '⭐' },
-  { name: '工具', slug: 'tools', icon: '🛠️' },
-  { name: '学习', slug: 'learn', icon: '📚' },
-  { name: '娱乐', slug: 'fun', icon: '🎮' },
+  { name: '常用', slug: 'common', icon: 'lucide:Star' },
+  { name: '工具', slug: 'tools', icon: 'lucide:Wrench' },
+  { name: '学习', slug: 'learn', icon: 'lucide:BookOpen' },
+  { name: '娱乐', slug: 'fun', icon: 'lucide:Gamepad2' },
 ]
 
 /** 生成唯一 ID */
@@ -38,7 +38,7 @@ export function buildNewTab(request: CreateTabRequest, existingCount: number, no
     id: generateId(),
     name: request.name,
     slug,
-    icon: request.icon || '📁',
+    icon: request.icon || 'lucide:Folder',
     sortOrder: request.sortOrder ?? existingCount,
     isDefault: request.isDefault || false,
     updatedAt: now,

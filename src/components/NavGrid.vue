@@ -4,7 +4,8 @@ import { ElMessageBox } from 'element-plus'
 import { Maximize2, Plus, Pencil, Trash2, FolderOpen, SearchX } from 'lucide-vue-next'
 import { useCabinStore } from '@/stores/cabin'
 import { domainOf } from '@/core/navCore'
-import { openAddSite, openEditSite } from '@/composables/ui'
+import { openAddSite, openEditSite, openSectionPanel } from '@/composables/ui'
+import AppIcon from '@/components/AppIcon.vue'
 import type { NavSite, NavTab } from '@/types/index'
 
 const store = useCabinStore()
@@ -191,12 +192,12 @@ function jumpToTab(tab: NavTab) {
       <section v-for="sec in sections" :key="sec.tab.id" class="zone-wrapper">
         <!-- 区头（盒子外面） -->
         <header class="zone-title-bar">
-          <span class="zone-title-icon">{{ sec.tab.icon }}</span>
+          <AppIcon class="zone-title-icon" :name="sec.tab.icon" :size="15" />
           <button class="zone-title-text" :title="`在网格布局中管理“${sec.tab.name}”`" @click="jumpToTab(sec.tab)">
             {{ sec.tab.name }}
           </button>
           <span class="zone-count">{{ sec.sites.length }}</span>
-          <button class="zone-expand-btn" title="展开管理" @click="jumpToTab(sec.tab)">
+          <button class="zone-expand-btn" title="查看详情" @click="openSectionPanel(sec.tab.id)">
             <Maximize2 :size="13" />
           </button>
         </header>
