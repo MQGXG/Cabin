@@ -1,15 +1,91 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Cabin 品牌标：彩色渐变漩涡圆 -->
-  <defs>
-    <linearGradient id="cabin-g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ff5f6d"/>
-      <stop offset="0.35" stop-color="#ffc371"/>
-      <stop offset="0.62" stop-color="#3ecf9a"/>
-      <stop offset="0.82" stop-color="#3d8bfd"/>
-      <stop offset="1" stop-color="#8f5bff"/>
-    </linearGradient>
-  </defs>
-  <circle cx="32" cy="32" r="28" fill="url(#cabin-g)"/>
-  <path d="M32 15a17 17 0 1 0 17 17" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/>
-  <circle cx="32" cy="32" r="6" fill="#fff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+<title id="title">小木屋 LittleWoodHouse</title>
+<desc id="desc">温暖的木屋坐落在山林与小路之间，搭配小木屋中文品牌名和 LittleWoodHouse 英文名。</desc>
+<defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#79c9ee"/><stop offset="1" stop-color="#b5e8f7"/></linearGradient>
+  <linearGradient id="mountain" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4a9bd0"/><stop offset="1" stop-color="#2f78ae"/></linearGradient>
+  <linearGradient id="roof" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8a482d"/><stop offset="1" stop-color="#61311f"/></linearGradient>
+  <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d99351"/><stop offset="1" stop-color="#b96d39"/></linearGradient>
+  <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8acb5b"/><stop offset="1" stop-color="#5a9f42"/></linearGradient>
+  <clipPath id="circle"><circle cx="512" cy="365" r="272"/></clipPath>
+</defs>
+<!-- circular landscape -->
+<circle cx="512" cy="365" r="272" fill="#fff" stroke="#e7f2f4" stroke-width="2"/>
+<g clip-path="url(#circle)">
+  <rect x="235" y="90" width="554" height="555" fill="url(#sky)"/>
+  <circle cx="610" cy="192" r="43" fill="#ffdb69"/>
+  <g fill="#fff" opacity=".95">
+    <path d="M297 244c-1-15 12-27 28-27 5-22 24-34 45-26 13 5 21 17 22 31 17-1 28 10 28 22H297z"/>
+    <path d="M584 265c-1-13 10-23 23-23 5-17 22-26 38-19 10 4 17 14 18 25 12 0 21 8 21 18H584z"/>
+    <path d="M674 325c0-15 12-26 27-26 7-17 24-25 41-18 11 5 17 15 18 27 13-1 23 7 23 17H674z"/>
+  </g>
+  <path d="M220 408L345 307 393 345 477 244 602 360 666 310 804 414 804 540 220 540Z" fill="#63b0dd"/>
+  <path d="M214 437L382 318 439 365 524 266 674 398 746 352 815 425V570H214Z" fill="url(#mountain)"/>
+  <path d="M450 278L524 266 565 304 531 291 506 310 482 297 462 313 439 302Z" fill="#8bc9e9" opacity=".6"/>
+  <!-- distant greenery -->
+  <path d="M225 474Q310 420 395 466T590 463T807 450V620H225Z" fill="#397e5c"/>
+  <!-- left pine -->
+  <g>
+    <path d="M284 502L330 367 347 405 365 398 344 442 365 437 338 478 359 477 333 521Z" fill="#1c5949"/>
+    <path d="M267 543L330 421 350 458 371 451 347 491 371 486 342 531 361 528 335 561Z" fill="#164c41"/>
+    <path d="M302 569L331 518 355 569Z" fill="#175446"/>
+    <rect x="326" y="548" width="13" height="43" rx="4" fill="#855034"/>
+  </g>
+  <!-- right pine -->
+  <g>
+    <path d="M663 514L700 407 716 441 732 434 713 469 731 465 709 501 727 498 703 534Z" fill="#236b53"/>
+    <path d="M650 551L700 456 720 488 737 482 716 516 736 513 711 548 728 545 704 574Z" fill="#195743"/>
+    <rect x="696" y="552" width="12" height="34" rx="4" fill="#805035"/>
+  </g>
+  <!-- shrubs -->
+  <path d="M245 559Q254 520 286 534Q298 505 325 529Q346 504 371 534Q397 520 416 552V603H245Z" fill="#4f9847"/>
+  <path d="M608 564Q624 525 650 539Q670 506 694 535Q721 519 741 549Q766 533 788 566V610H608Z" fill="#438b42"/>
+  <!-- ground -->
+  <path d="M214 568Q336 530 449 566T807 551V647H214Z" fill="url(#grass)"/>
+  <path d="M222 594Q339 558 452 588T804 577V651H222Z" fill="#70b94b"/>
+  <!-- fence -->
+  <g stroke="#a75f34" stroke-width="10" stroke-linecap="round">
+    <path d="M322 553V600M365 548V599M408 553V600"/>
+    <path d="M318 569H413M318 589H413" stroke-width="9"/>
+  </g>
+  <!-- cabin body -->
+  <path d="M376 397L512 304 650 397V564H376Z" fill="url(#wood)" stroke="#85482c" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M379 430H648M379 462H648M379 495H648M379 528H648" stroke="#a95e32" stroke-width="5" opacity=".75"/>
+  <path d="M376 397L512 304 650 397" fill="none" stroke="#efb06b" stroke-width="5" opacity=".5"/>
+  <!-- roof -->
+  <path d="M341 407L493 289Q512 274 530 289L685 405Q700 419 685 431L672 438 512 322 356 438 341 426Q331 417 341 407Z" fill="url(#roof)"/>
+  <path d="M355 414L512 297 672 414" fill="none" stroke="#b96d3d" stroke-width="10" stroke-linecap="round"/>
+  <path d="M512 304L643 402" stroke="#d98a4e" stroke-width="9" stroke-linecap="round"/>
+  <!-- chimney -->
+  <path d="M584 323V283H625V366H604V323Z" fill="#7a432d"/>
+  <rect x="580" y="279" width="48" height="15" rx="3" fill="#613523"/>
+  <!-- smoke -->
+  <path d="M604 276C590 258 609 250 617 238C627 223 609 216 615 201" fill="none" stroke="#f9f5e8" stroke-width="19" stroke-linecap="round" opacity=".95"/>
+  <!-- window -->
+  <rect x="408" y="437" width="68" height="66" rx="7" fill="#ffe68b" stroke="#8a4b2c" stroke-width="8"/>
+  <path d="M442 440V500M412 470H472" stroke="#d78a3e" stroke-width="6"/>
+  <path d="M401 508H482" stroke="#82452b" stroke-width="9" stroke-linecap="round"/>
+  <!-- door -->
+  <path d="M519 458Q519 430 546 430Q573 430 573 458V565H519Z" fill="#70402b" stroke="#5c3324" stroke-width="6"/>
+  <path d="M546 438V555" stroke="#875235" stroke-width="4" opacity=".7"/>
+  <circle cx="559" cy="500" r="5" fill="#ffcb56"/>
+  <!-- bush foreground -->
+  <g fill="#267b4f">
+    <circle cx="470" cy="568" r="24"/><circle cx="492" cy="579" r="28"/><circle cx="522" cy="573" r="22"/>
+    <circle cx="604" cy="570" r="25"/><circle cx="626" cy="578" r="27"/><circle cx="651" cy="567" r="23"/>
+  </g>
+  <g fill="#398d4d">
+    <circle cx="482" cy="558" r="19"/><circle cx="514" cy="563" r="18"/><circle cx="615" cy="557" r="19"/><circle cx="642" cy="558" r="17"/>
+  </g>
+  <!-- winding path -->
+  <path d="M489 651C506 626 558 614 557 597C556 584 531 579 523 567C516 555 541 548 565 541L605 541C578 562 562 570 582 586C611 608 628 622 600 642C585 652 562 659 552 674Z" fill="#fff0cf"/>
+  <path d="M520 646C535 629 574 619 575 605" fill="none" stroke="#f9dba0" stroke-width="5" stroke-linecap="round"/>
+  <g fill="#dba76d">
+    <ellipse cx="533" cy="600" rx="9" ry="4"/><ellipse cx="561" cy="636" rx="10" ry="4"/>
+  </g>
+  <g fill="#4f9d46">
+    <path d="M289 625q-8-27 3-38q15 22 7 39q18-21 29-17q-7 22-29 27z"/>
+    <path d="M679 617q-7-24 4-37q13 20 6 36q15-17 25-13q-7 19-25 23z"/>
+  </g>
+</g>
 </svg>

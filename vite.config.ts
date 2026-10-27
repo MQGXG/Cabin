@@ -5,7 +5,9 @@ import { fileURLToPath, URL } from 'node:url'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), tailwindcss()],
+  // transformAssetUrls:false —— 模板中的 /logo.svg 等 public 资源保持 URL 引用，
+  // 不被转为 data URL（否则改 logo 后仍显示内联的旧内容）
+  plugins: [vue({ template: { transformAssetUrls: false } }), tailwindcss()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
