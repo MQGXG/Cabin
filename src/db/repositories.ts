@@ -197,6 +197,29 @@ export function seedIfNeeded(db: Database, now = Date.now()): boolean {
   return true
 }
 
+/** 历史默认标签的旧 emoji 图标 → lucide（仅 name+emoji 双匹配才迁移，尊重用户自选图标） */
+const LEGACY_DEFAULT_TAB_ICONS = [
+  { name: '常用', legacy: '⭐', icon: 'lucide:Star' },
+  { name: '工具', legacy: '🛠️', icon: 'lucide:Wrench' },
+  { name: '学习', legacy: '📚', icon: 'lucide:BookOpen' },
+  { name: '娱乐', legacy: '🎮', icon: 'lucide:Gamepad2' },
+]
+
+/** 一次性迁移：老库里 emoji 种子标签升级为 lucide 图标 */
+export function migrateLegacyTabIcons(db: Database): boolean {
+  let changed = false
+  for (const m of LEGACY_DEFAULT_TAB_ICONS) {
+    db.run('UPDATE tabs SET icon = ? WHERE name = ? AND icon = ? AND is_deleted = 0', [
+      m.icon,
+      m.name,
+      m.legacy,
+    ])
+    if (db.getRowsModified() > 0) changed = true
+  }
+  if (changed) schedulePersist()
+  return changed
+}
+
 /** 备份恢复：整库替换 */
 export function replaceAll(db: Database, tabs: NavTab[], sites: NavSite[]): void {
   db.run('DELETE FROM tabs')

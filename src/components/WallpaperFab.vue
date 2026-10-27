@@ -130,9 +130,14 @@ function clearWallpaper() {
   border: 1px solid var(--c-border);
   background: var(--c-bg-soft);
   cursor: pointer;
-  font-size: 18px;
+  font-size: 16px;
   transition: all 0.2s;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  /* 图标在按钮内绝对居中（lucide SVG 为 inline 元素，需 flex 归位） */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
 .wall-fab:hover {
   border-color: var(--c-primary);

@@ -43,10 +43,12 @@ function toggleTheme() {
 </template>
 
 <style scoped>
-/* 顶栏固定浅色（还原原版浅灰顶栏 + 深色内容区的双色调布局） */
+/* 顶栏：半透明毛玻璃，颜色全部走主题变量（深/浅色自动适配） */
 .app-header {
-  background: #f2f4f8;
-  border-bottom: 1px solid rgba(30, 40, 70, 0.08);
+  background: color-mix(in srgb, var(--c-header-bg) 72%, transparent);
+  backdrop-filter: blur(16px) saturate(1.25);
+  -webkit-backdrop-filter: blur(16px) saturate(1.25);
+  border-bottom: 1px solid var(--c-border);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -68,13 +70,13 @@ function toggleTheme() {
 .brand-logo {
   width: 30px;
   height: 30px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
 }
 .brand-name {
   font-size: 21px;
   font-weight: 800;
   letter-spacing: 0.5px;
-  color: #16a06a;
+  color: var(--c-primary);
 }
 .search-wrap {
   flex: 1;
@@ -83,26 +85,30 @@ function toggleTheme() {
   position: relative;
   display: flex;
   align-items: center;
-  background: #fff;
-  border: 1px solid rgba(30, 40, 70, 0.1);
+  background: color-mix(in srgb, var(--c-bg) 45%, transparent);
+  border: 1px solid var(--c-border);
   border-radius: 999px;
   padding: 8px 18px;
+  transition: border-color 0.2s;
+}
+.search-wrap:focus-within {
+  border-color: var(--c-primary);
 }
 .search-icon {
-  color: #8a94a8;
+  color: var(--c-text-dim);
   margin-right: 10px;
-  font-size: 14px;
+  flex-shrink: 0;
 }
 .search-input {
   flex: 1;
   background: transparent;
   border: none;
   outline: none;
-  color: #22304f;
+  color: var(--c-text);
   font-size: 14px;
 }
 .search-input::placeholder {
-  color: #8a94a8;
+  color: var(--c-text-dim);
 }
 .header-actions {
   display: flex;
@@ -114,9 +120,9 @@ function toggleTheme() {
   min-width: 38px;
   padding: 0 8px;
   border-radius: 10px;
-  border: 1px solid rgba(30, 40, 70, 0.1);
-  background: #fff;
-  color: #3a4763;
+  border: 1px solid var(--c-border);
+  background: color-mix(in srgb, var(--c-bg-soft) 55%, transparent);
+  color: var(--c-text-dim);
   cursor: pointer;
   font-size: 16px;
   transition: all 0.2s;
@@ -125,21 +131,22 @@ function toggleTheme() {
   justify-content: center;
 }
 .icon-btn:hover {
-  border-color: #16a06a;
-  background: rgba(34, 197, 139, 0.1);
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+  background: var(--c-primary-soft);
 }
 /* 主题主色按钮（+ 添加网站） */
 .icon-btn.primary {
-  background: #22c58b;
-  border-color: #22c58b;
+  background: var(--c-primary);
+  border-color: var(--c-primary);
   color: #fff;
   font-weight: 800;
   font-size: 20px;
   padding: 0 12px;
-  box-shadow: 0 4px 12px rgba(34, 197, 139, 0.35);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--c-primary) 40%, transparent);
 }
 .icon-btn.primary:hover {
-  background: #1fb37f;
+  filter: brightness(1.08);
 }
 @media (max-width: 720px) {
   .header-inner {

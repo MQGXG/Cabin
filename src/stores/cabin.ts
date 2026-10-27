@@ -6,7 +6,7 @@ import { initDatabase, persistNow, installBeforeUnload, exportBytes } from '@/db
 import {
   loadTabs, insertTab, updateTabRow, clearOtherDefaults, softDeleteTab,
   loadSites, insertSite, updateSiteRow, incrementClick, softDeleteSite,
-  loadSettings, saveSetting, seedIfNeeded, replaceAll,
+  loadSettings, saveSetting, seedIfNeeded, replaceAll, migrateLegacyTabIcons,
 } from '@/db/repositories'
 import {
   buildNewTab, applyTabUpdate, exclusiveDefaultTabs, buildNewSite, applySiteUpdate,
@@ -70,6 +70,7 @@ export const useCabinStore = defineStore('cabin', {
     async init() {
       this.db = await initDatabase()
       seedIfNeeded(this.db)
+      migrateLegacyTabIcons(this.db)
       this.tabs = loadTabs(this.db)
       this.sites = loadSites(this.db)
       this.settings = loadSettings(this.db)
@@ -224,9 +225,9 @@ export const useCabinStore = defineStore('cabin', {
       ;(this.settings as unknown as Record<string, unknown>)[key as string] = value
       saveSetting(db, key as string, String(value))
     },
-    /** 切换主题（关闭“跟随系统”，显式切暗/亮） */
+    /** 切换主题（基于当前实际生效的暗色状态，保证每次点击立即可见变化；同时关闭“跟随系统”） */
     async toggleTheme(): Promise<void> {
-      const next = this.settings.theme === 'dark' ? 'light' : 'dark'
+      const next = this.effectiveDark ? 'light' : 'dark'
       await this.patchSetting('themeFollowSystem', false)
       await this.patchSetting('theme', next)
     },
