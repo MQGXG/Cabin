@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Search, Plus, Sun, Moon, Settings, DatabaseBackup } from 'lucide-vue-next'
+import { Search, Plus, Sun, Moon, Settings, DatabaseBackup, BookOpen } from 'lucide-vue-next'
 import { useCabinStore } from '@/stores/cabin'
-import { openBackup, openSettings, openAddSite } from '@/composables/ui'
+import { openBackup, openSettings, openAddSite, openBlog } from '@/composables/ui'
 
 const store = useCabinStore()
 const keyword = ref('')
@@ -61,6 +61,7 @@ function toggleTheme() {
 
       <!-- 右侧操作 -->
       <div class="header-actions">
+        <button class="icon-btn" title="博客（本地写作与阅读）" @click="openBlog()"><BookOpen :size="17" /></button>
         <button class="icon-btn primary" title="添加网站" @click="openAddSite()"><Plus :size="18" :stroke-width="2.6" /></button>
         <button class="icon-btn" title="切换主题" @click="toggleTheme">
           <Sun v-if="store.effectiveDark" :size="17" />

@@ -51,6 +51,64 @@ export interface BackupRecord {
   payload: string
 }
 
+/* ==================== 博客模块 ==================== */
+
+/** 文章状态（离线精简版：草稿 ↔ 已发布，无审核流） */
+export type BlogPostStatus = 'draft' | 'published'
+
+/** 博客文章 */
+export interface BlogPost {
+  id: string
+  slug: string // URL 友好标识（保留中文）
+  title: string
+  subtitle: string
+  excerpt: string // 摘要（空则自动截断）
+  contentMarkdown: string
+  status: BlogPostStatus
+  categoryId: string // '' = 未分类
+  tagIds: string[]
+  pinned: boolean
+  viewCount: number
+  readingMinutes: number
+  createdAt: number
+  updatedAt: number
+  publishedAt: number | null
+  deletedAt: number | null // 软删（回收站）
+}
+
+/** 博客分类 */
+export interface BlogCategory {
+  id: string
+  name: string
+  slug: string
+  createdAt: number
+}
+
+/** 博客标签 */
+export interface BlogTag {
+  id: string
+  name: string
+  slug: string
+  createdAt: number
+}
+
+/** 博客设置（键值存储） */
+export interface BlogSettings {
+  blogName: string
+  blogDescription: string
+  pageSize: number
+  excerptLength: number
+}
+
+/** 博客排序方式 */
+export type BlogSort =
+  | 'updated-desc'
+  | 'updated-asc'
+  | 'created-desc'
+  | 'published-desc'
+  | 'views-desc'
+  | 'title-asc'
+
 /** 数据库元信息 */
 export interface DbMeta {
   key: string

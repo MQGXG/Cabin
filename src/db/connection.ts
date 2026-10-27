@@ -109,6 +109,41 @@ function migrate(db: Database): void {
       kind TEXT NOT NULL,
       payload TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS blog_posts (
+      id TEXT PRIMARY KEY,
+      slug TEXT NOT NULL UNIQUE,
+      title TEXT NOT NULL,
+      subtitle TEXT NOT NULL DEFAULT '',
+      excerpt TEXT NOT NULL DEFAULT '',
+      content_md TEXT NOT NULL DEFAULT '',
+      status TEXT NOT NULL DEFAULT 'draft',
+      category_id TEXT NOT NULL DEFAULT '',
+      tag_ids TEXT NOT NULL DEFAULT '[]',
+      pinned INTEGER NOT NULL DEFAULT 0,
+      view_count INTEGER NOT NULL DEFAULT 0,
+      reading_minutes INTEGER NOT NULL DEFAULT 1,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      published_at INTEGER,
+      deleted_at INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS idx_blog_posts_status ON blog_posts (status, deleted_at, pinned, updated_at DESC);
+    CREATE TABLE IF NOT EXISTS blog_categories (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      slug TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS blog_tags (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      slug TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS blog_settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
   `)
   // 旧库补列（断链检测结果）：列已存在时跳过
   addColumnIfMissing(db, 'navigations', 'is_valid', 'INTEGER');

@@ -13,18 +13,21 @@
     "test:backup": "node --experimental-strip-types scripts/test-backup-core.ts",
     "test:engine": "node --experimental-strip-types scripts/test-engine-core.ts",
     "test:meta-link": "node --experimental-strip-types scripts/test-meta-link-backup.ts",
-    "test": "npm run test:nav && npm run test:import && npm run test:backup && npm run test:engine && npm run test:meta-link"
+    "test:blog": "node --experimental-strip-types scripts/test-blog-core.ts",
+    "test": "npm run test:nav && npm run test:import && npm run test:backup && npm run test:engine && npm run test:meta-link && npm run test:blog"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
     "element-plus": "^2.14.7",
     "lucide-vue-next": "^0.577.0",
+    "markdown-it": "^15.0.3",
     "pinia": "^4.1.0",
     "sql.js": "^1.15.1",
     "vue": "^3.5.44"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@types/markdown-it": "^14.2.0",
     "@types/node": "^24.19.2",
     "@types/sql.js": "^1.4.11",
     "@vitejs/plugin-vue": "^6.0.10",

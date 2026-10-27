@@ -13,6 +13,9 @@ import BackupDialog from '@/components/BackupDialog.vue'
 import SettingsDialog from '@/components/SettingsDialog.vue'
 import SectionPanel from '@/components/SectionPanel.vue'
 import SpotlightOverlay from '@/components/SpotlightOverlay.vue'
+import BlogFront from '@/components/blog/BlogFront.vue'
+import BlogAdmin from '@/components/blog/BlogAdmin.vue'
+import { ui } from '@/composables/ui'
 
 const store = useCabinStore()
 
@@ -29,20 +32,29 @@ watchEffect(() => {
 
 <template>
   <div class="app-shell">
-    <AppHeader />
-    <main class="app-main">
-      <TabBar />
-      <StatsBar />
-      <NavGrid v-if="store.ready" />
-      <div v-else class="loading-tip">正在加载本地数据库…</div>
-    </main>
-    <WallpaperFab />
-    <TabDialog />
-    <SiteDialog />
-    <ImportDialog />
-    <BackupDialog />
-    <SettingsDialog />
-    <SectionPanel />
+    <!-- 导航站视图 -->
+    <template v-if="ui.view === 'nav'">
+      <AppHeader />
+      <main class="app-main">
+        <TabBar />
+        <StatsBar />
+        <NavGrid v-if="store.ready" />
+        <div v-else class="loading-tip">正在加载本地数据库…</div>
+      </main>
+      <WallpaperFab />
+      <TabDialog />
+      <SiteDialog />
+      <ImportDialog />
+      <BackupDialog />
+      <SettingsDialog />
+      <SectionPanel />
+    </template>
+
+    <!-- 博客前台 -->
+    <BlogFront v-else-if="ui.view === 'blog'" />
+    <!-- 博客后台（内含全屏编辑器） -->
+    <BlogAdmin v-else />
+
     <SpotlightOverlay />
   </div>
 </template>

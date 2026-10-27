@@ -18,6 +18,10 @@ interface UiState {
   sectionPanelTabId: string
   /** Spotlight 全局搜索浮层 */
   spotlightOpen: boolean
+  /** 应用视图：导航站 / 博客前台 / 博客后台 */
+  view: 'nav' | 'blog' | 'blogAdmin'
+  /** 博客后台编辑器：null=不编辑，'new'=新建，否则编辑指定文章 id */
+  blogEditing: string | 'new' | null
 }
 
 export const ui = reactive<UiState>({
@@ -32,6 +36,8 @@ export const ui = reactive<UiState>({
   wallpaperOpen: false,
   sectionPanelTabId: '',
   spotlightOpen: false,
+  view: 'nav',
+  blogEditing: null,
 })
 
 export function openAddSite(tabId = '') {
@@ -63,4 +69,18 @@ export function openSettings() {
 /** 打开分区详情右侧面板 */
 export function openSectionPanel(tabId: string) {
   ui.sectionPanelTabId = tabId
+}
+
+/* ==================== 博客视图切换 ==================== */
+
+export function openBlog() {
+  ui.view = 'blog'
+  ui.spotlightOpen = false
+}
+export function openBlogAdmin() {
+  ui.view = 'blogAdmin'
+}
+export function backToNav() {
+  ui.view = 'nav'
+  ui.blogEditing = null
 }

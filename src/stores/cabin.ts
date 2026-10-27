@@ -23,6 +23,7 @@ import { checkDeadLinks, type CheckProgress } from '@/core/linkCheckCore'
 import { makeBackupId, shouldAutoBackup, isSameDay, AUTO_BACKUP_DEBOUNCE_MS } from '@/core/backupRing'
 import type { NavTab, NavSite, AppSettings, BackupRecord, Engine, CreateTabRequest, UpdateTabRequest, CreateSiteRequest, UpdateSiteRequest, BackupEnvelope, ImportResult } from '@/types'
 import type { Database } from 'sql.js'
+import { useBlogStore } from '@/stores/blog'
 
 /** 自动存档防抖定时器（模块级） */
 let autoBackupTimer: ReturnType<typeof setTimeout> | null = null
@@ -115,6 +116,10 @@ export const useCabinStore = defineStore('cabin', {
       }
       this.engines = ensureSingleDefault(normalizeEngines(engines))
       this.backups = listBackups(this.db)
+      // 供博客 store 复用同一 SQLite 单例（避免 store 间循环依赖）
+      ;(window as unknown as { __cabinDb?: unknown }).__cabinDb = this.db
+      // 博客模块初始化
+      await useBlogStore().init()
       const defTab = this.visibleTabs.find((t) => t.isDefault)
       this.activeTabId = defTab?.id ?? this.visibleTabs[0]?.id ?? ''
       // 系统主题变化监听（跟随系统时实时切换）
