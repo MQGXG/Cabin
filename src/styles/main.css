@@ -147,6 +147,15 @@ body {
 }
 
 /* Element Plus 暗色适配（跟随变量） */
+/* 弹窗真居中（覆盖 el-dialog 默认 15vh 顶部偏移）：
+   父 .el-overlay-dialog 设 flex，子 margin:auto——
+   弹窗超高时 auto margin 自动归零不裁剪顶部，父级 overflow 可滚动 */
+.el-overlay-dialog {
+  display: flex;
+}
+.el-dialog {
+  margin: auto !important;
+}
 .el-dialog {
   background: var(--c-bg-soft) !important;
   border-radius: 16px !important;
