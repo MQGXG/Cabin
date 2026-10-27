@@ -66,7 +66,7 @@ function migrate(db: Database): void {
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       slug TEXT NOT NULL,
-      icon TEXT NOT NULL DEFAULT '⭐',
+      icon TEXT NOT NULL DEFAULT 'lucide:Folder',
       sort_order INTEGER NOT NULL DEFAULT 0,
       is_default INTEGER NOT NULL DEFAULT 0,
       updated_at INTEGER NOT NULL,

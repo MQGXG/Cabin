@@ -16,10 +16,13 @@ function toggleTheme() {
 <template>
   <header class="app-header">
     <div class="header-inner">
-      <!-- 品牌 -->
-      <div class="brand">
-        <img class="brand-logo" src="/logo.svg" alt="Cabin" />
-        <span class="brand-name">Cabin</span>
+      <!-- 品牌（小木屋 logo：插画图标 + 中英文品牌名） -->
+      <div class="brand" title="小木屋 LittleWoodHouse">
+        <img class="brand-logo" src="/logo.svg" alt="小木屋" />
+        <span class="brand-text">
+          <span class="brand-name">小木屋</span>
+          <span class="brand-sub">LittleWoodHouse</span>
+        </span>
       </div>
 
       <!-- 顶部搜索 -->
@@ -64,19 +67,37 @@ function toggleTheme() {
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   user-select: none;
+  /* 品牌文字：暗色用暖白，亮色用 logo 原图棕 */
+  --brand-ink: #ecdbc8;
+}
+html.theme-light .brand {
+  --brand-ink: #542a1b;
 }
 .brand-logo {
-  width: 30px;
-  height: 30px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
+}
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
 }
 .brand-name {
-  font-size: 21px;
+  font-size: 22px;
   font-weight: 800;
-  letter-spacing: 0.5px;
-  color: var(--c-primary);
+  letter-spacing: 4px;
+  color: var(--brand-ink);
+}
+.brand-sub {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  color: var(--brand-ink);
+  opacity: 0.65;
 }
 .search-wrap {
   flex: 1;
@@ -153,7 +174,7 @@ function toggleTheme() {
     padding: 10px 16px;
     gap: 12px;
   }
-  .brand-name {
+  .brand-text {
     display: none;
   }
 }
