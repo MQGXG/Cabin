@@ -81,7 +81,7 @@ async function submit() {
     <el-form label-position="top">
       <el-form-item label="标签分类">
         <el-select v-model="form.tabId" style="width: 100%">
-          <el-option v-for="t in store.visibleTabs" :key="t.id" :value="t.id">
+          <el-option v-for="t in store.visibleTabs" :key="t.id" :label="t.name" :value="t.id">
             <span class="tab-option"><AppIcon :name="t.icon" :size="14" /> {{ t.name }}</span>
           </el-option>
         </el-select>

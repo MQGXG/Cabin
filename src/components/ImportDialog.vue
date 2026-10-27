@@ -103,7 +103,7 @@ async function submit() {
       <Bookmark :size="15" />
       <span>导入到标签：</span>
       <el-select v-model="targetTabId" size="small" class="target-select">
-        <el-option v-for="t in store.visibleTabs" :key="t.id" :value="t.id">
+        <el-option v-for="t in store.visibleTabs" :key="t.id" :label="t.name" :value="t.id">
           <span class="tab-option"><AppIcon :name="t.icon" :size="14" /> {{ t.name }}</span>
         </el-option>
       </el-select>

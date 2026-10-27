@@ -59,15 +59,15 @@ function toggleTheme() {
 .header-inner {
   max-width: 1720px;
   margin: 0 auto;
-  padding: 12px 40px;
+  padding: 10px 40px;
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 32px;
 }
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   user-select: none;
   /* 品牌文字：暗色用暖白，亮色用 logo 原图棕 */
   --brand-ink: #ecdbc8;
@@ -76,28 +76,33 @@ html.theme-light .brand {
   --brand-ink: #542a1b;
 }
 .brand-logo {
-  width: 46px;
-  height: 46px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
+  flex-shrink: 0;
+  filter: drop-shadow(0 3px 7px rgba(0, 0, 0, 0.28));
 }
 .brand-text {
   display: flex;
   flex-direction: column;
-  line-height: 1.1;
+  justify-content: center;
+  /* 与 logo 等高，保证两侧垂直对齐 */
+  height: 58px;
+  line-height: 1.15;
 }
 .brand-name {
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 800;
-  letter-spacing: 4px;
+  letter-spacing: 5px;
   color: var(--brand-ink);
 }
 .brand-sub {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 2.5px;
+  letter-spacing: 3px;
   color: var(--brand-ink);
   opacity: 0.65;
+  margin-top: 3px;
 }
 .search-wrap {
   flex: 1;
@@ -109,7 +114,7 @@ html.theme-light .brand {
   background: color-mix(in srgb, var(--c-bg) 45%, transparent);
   border: 1px solid var(--c-border);
   border-radius: 999px;
-  padding: 8px 18px;
+  padding: 11px 20px;
   transition: border-color 0.2s;
 }
 .search-wrap:focus-within {
@@ -137,10 +142,10 @@ html.theme-light .brand {
   gap: 10px;
 }
 .icon-btn {
-  height: 38px;
-  min-width: 38px;
-  padding: 0 8px;
-  border-radius: 10px;
+  height: 42px;
+  min-width: 42px;
+  padding: 0 9px;
+  border-radius: 12px;
   border: 1px solid var(--c-border);
   background: color-mix(in srgb, var(--c-bg-soft) 55%, transparent);
   color: var(--c-text-dim);
@@ -162,8 +167,8 @@ html.theme-light .brand {
   border-color: var(--c-primary);
   color: #fff;
   font-weight: 800;
-  font-size: 20px;
-  padding: 0 12px;
+  font-size: 22px;
+  padding: 0 13px;
   box-shadow: 0 4px 12px color-mix(in srgb, var(--c-primary) 40%, transparent);
 }
 .icon-btn.primary:hover {
