@@ -27,6 +27,28 @@ export interface NavSite {
   createdAt: number
   updatedAt: number
   isDeleted: boolean
+  /** 断链检测：null=未检测，1=有效，0=失效 */
+  isValid: number | null
+  lastCheckedAt: number | null
+}
+
+/** 搜索引擎 */
+export interface Engine {
+  id: string
+  name: string
+  url: string
+  isDefault: boolean
+  sort: number
+  isBuiltIn: boolean
+  disabled: boolean
+}
+
+/** 自动存档记录（列表展示，payload 按需加载） */
+export interface BackupRecord {
+  id: string
+  createdAt: number
+  kind: 'auto' | 'manual'
+  payload: string
 }
 
 /** 数据库元信息 */

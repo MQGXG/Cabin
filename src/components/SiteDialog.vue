@@ -4,12 +4,14 @@ import { ElMessage } from 'element-plus'
 import { useCabinStore } from '@/stores/cabin'
 import { ui } from '@/composables/ui'
 import { suggestFavicon, normalizeUrl } from '@/core/navCore'
+import { fetchMetadata } from '@/core/metadataCore'
 import AppIcon from '@/components/AppIcon.vue'
 
 const store = useCabinStore()
 
 const form = ref({ name: '', url: '', description: '', favicon: '', tabId: '' })
 const autoIcon = ref(true)
+const fetching = ref(false)
 
 const isEdit = computed(() => !!ui.siteEditing)
 
@@ -48,8 +50,33 @@ watch(
   () => form.value.url,
   (url) => {
     if (!isEdit.value && autoIcon.value) form.value.favicon = suggestFavicon(url)
+    scheduleMetaFetch(url)
   },
 )
+
+/** 名称为空时，URL 停顿 800ms 后自动抓取标题/描述/图标（Jina → allorigins 降级，失败静默） */
+let metaTimer: ReturnType<typeof setTimeout> | null = null
+function scheduleMetaFetch(url: string) {
+  if (metaTimer) clearTimeout(metaTimer)
+  if (isEdit.value) return
+  const normalized = normalizeUrl(url)
+  if (!/^https?:\/\//.test(normalized)) return
+  metaTimer = setTimeout(async () => {
+    // 用户已手动填了名称则不打扰
+    if (form.value.name.trim()) return
+    fetching.value = true
+    try {
+      const meta = await fetchMetadata(normalized)
+      if (meta) {
+        if (!form.value.name.trim() && meta.title) form.value.name = meta.title.slice(0, 100)
+        if (!form.value.description.trim() && meta.description) form.value.description = meta.description
+        if (autoIcon.value && meta.icon) form.value.favicon = meta.icon
+      }
+    } finally {
+      fetching.value = false
+    }
+  }, 800)
+}
 
 async function submit() {
   if (!form.value.name.trim()) return void ElMessage.warning('请填写名称')
@@ -91,6 +118,7 @@ async function submit() {
       </el-form-item>
       <el-form-item label="URL" required>
         <el-input v-model="form.url" placeholder="https://example.com" />
+        <div v-if="fetching" class="fetching-hint">正在自动抓取网站标题与描述…</div>
       </el-form-item>
       <el-form-item label="描述（可选）">
         <el-input v-model="form.description" type="textarea" :rows="2" maxlength="200" />
@@ -120,5 +148,20 @@ async function submit() {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+.fetching-hint {
+  font-size: 12px;
+  color: var(--c-primary);
+  margin-top: 4px;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 </style>

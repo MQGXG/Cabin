@@ -162,6 +162,7 @@ function jumpToTab(tab: NavTab) {
             @error="onImgError(site)"
           />
           <span v-else class="fallback">{{ site.name.slice(0, 1).toUpperCase() }}</span>
+          <span v-if="site.isValid === 0" class="broken-dot" title="失效链接（设置中可重新检测）" />
         </div>
         <div class="name" :title="site.name">{{ site.name }}</div>
         <div class="domain" :title="site.url">{{ domainOf(site.url) }}</div>
@@ -224,6 +225,7 @@ function jumpToTab(tab: NavTab) {
                     @error="onImgError(site)"
                   />
                   <span v-else class="zone-fallback">{{ site.name.slice(0, 1).toUpperCase() }}</span>
+                  <span v-if="site.isValid === 0" class="zone-broken-dot" title="失效链接" />
                 </span>
                 <span class="zone-item-title">{{ site.name }}</span>
               </a>
@@ -327,6 +329,7 @@ function jumpToTab(tab: NavTab) {
   color: #fff;
 }
 .favicon {
+  position: relative;
   width: 44px;
   height: 44px;
   display: flex;
@@ -353,6 +356,18 @@ function jumpToTab(tab: NavTab) {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+/* 失效链接红点 */
+.broken-dot {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #f56c6c;
+  border: 2px solid var(--c-bg-soft);
+  box-sizing: border-box;
 }
 .name {
   font-size: 14px;
@@ -509,15 +524,27 @@ function jumpToTab(tab: NavTab) {
   background: color-mix(in srgb, var(--c-text) 9%, transparent);
 }
 .zone-item-icon {
+  position: relative;
   width: 16px;
   height: 16px;
   border-radius: 3px;
-  overflow: hidden;
+  overflow: visible;
   background: color-mix(in srgb, var(--c-text) 12%, transparent);
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.zone-broken-dot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f56c6c;
+  border: 1.5px solid var(--c-bg-soft);
+  box-sizing: border-box;
 }
 .zone-item-icon img {
   width: 100%;

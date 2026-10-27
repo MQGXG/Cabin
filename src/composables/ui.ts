@@ -16,6 +16,8 @@ interface UiState {
   wallpaperOpen: boolean
   /** 分区详情右侧面板（null = 关闭） */
   sectionPanelTabId: string
+  /** Spotlight 全局搜索浮层 */
+  spotlightOpen: boolean
 }
 
 export const ui = reactive<UiState>({
@@ -29,6 +31,7 @@ export const ui = reactive<UiState>({
   settingsOpen: false,
   wallpaperOpen: false,
   sectionPanelTabId: '',
+  spotlightOpen: false,
 })
 
 export function openAddSite(tabId = '') {

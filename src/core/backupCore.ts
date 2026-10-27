@@ -33,7 +33,7 @@ export function validateBackupEnvelope(raw: unknown): BackupEnvelope | null {
   if (!Array.isArray(obj.tabs) || !Array.isArray(obj.sites)) return null
 
   const tabs: NavTab[] = (obj.tabs as unknown[]).filter(isValidTab)
-  const sites: NavSite[] = (obj.sites as unknown[]).filter(isValidSite)
+  const sites: NavSite[] = (obj.sites as unknown[]).filter(isValidSite).map(withSiteDefaults)
 
   // 站点的 tabId 悬空时丢弃（防脏数据）
   const tabIds = new Set(tabs.map((t) => t.id))
@@ -66,6 +66,11 @@ function isValidSite(s: unknown): s is NavSite {
     typeof o?.name === 'string' &&
     typeof o?.url === 'string'
   )
+}
+
+/** 旧备份兼容：补默认字段（isValid/lastCheckedAt 在旧版不存在） */
+function withSiteDefaults(s: NavSite): NavSite {
+  return { ...s, isValid: s.isValid ?? null, lastCheckedAt: s.lastCheckedAt ?? null }
 }
 
 /** 按域名对备份数据做去重合并（local 优先，返回需新增的部分） */

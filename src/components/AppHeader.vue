@@ -8,6 +8,14 @@ const store = useCabinStore()
 const keyword = ref('')
 watch(keyword, (v) => store.setSearch(v))
 
+/** 回车：本地引擎 → 站内过滤；其它 → 新窗口打开搜索引擎 */
+function onSubmit() {
+  const submitted = store.submitSearch(keyword.value)
+  if (submitted && store.currentEngine.id !== 'local') {
+    keyword.value = ''
+  }
+}
+
 function toggleTheme() {
   void store.toggleTheme()
 }
@@ -25,10 +33,30 @@ function toggleTheme() {
         </span>
       </div>
 
-      <!-- 顶部搜索 -->
+      <!-- 顶部搜索（带引擎切换） -->
       <div class="search-wrap">
+        <el-select
+          class="engine-select"
+          :model-value="store.currentEngine.id"
+          popper-class="engine-popper"
+          @change="store.setEngineAsActive($event)"
+        >
+          <el-option
+            v-for="e in store.availableEngineList"
+            :key="e.id"
+            :label="e.name"
+            :value="e.id"
+          />
+        </el-select>
+        <span class="engine-divider" />
         <Search :size="15" class="search-icon" />
-        <input v-model="keyword" class="search-input" type="text" placeholder="搜索导航..." />
+        <input
+          v-model="keyword"
+          class="search-input"
+          type="text"
+          :placeholder="store.currentEngine.id === 'local' ? '搜索导航...' : `用 ${store.currentEngine.name} 搜索...`"
+          @keyup.enter="onSubmit"
+        />
       </div>
 
       <!-- 右侧操作 -->
@@ -119,6 +147,33 @@ html.theme-light .brand {
 }
 .search-wrap:focus-within {
   border-color: var(--c-primary);
+}
+/* 引擎下拉（嵌入搜索框左端，透明无框） */
+.engine-select {
+  width: 86px;
+  flex-shrink: 0;
+}
+.engine-select :deep(.el-select__wrapper) {
+  background: transparent;
+  box-shadow: none !important;
+  padding: 0;
+  min-height: auto;
+}
+.engine-select :deep(.el-select__selected-item) {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-text);
+}
+.engine-select :deep(.el-select__caret) {
+  color: var(--c-text-dim);
+  font-size: 12px;
+}
+.engine-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--c-border);
+  margin-right: 10px;
+  flex-shrink: 0;
 }
 .search-icon {
   color: var(--c-text-dim);

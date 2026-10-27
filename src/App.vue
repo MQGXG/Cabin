@@ -12,6 +12,7 @@ import ImportDialog from '@/components/ImportDialog.vue'
 import BackupDialog from '@/components/BackupDialog.vue'
 import SettingsDialog from '@/components/SettingsDialog.vue'
 import SectionPanel from '@/components/SectionPanel.vue'
+import SpotlightOverlay from '@/components/SpotlightOverlay.vue'
 
 const store = useCabinStore()
 
@@ -42,6 +43,7 @@ watchEffect(() => {
     <BackupDialog />
     <SettingsDialog />
     <SectionPanel />
+    <SpotlightOverlay />
   </div>
 </template>
 

@@ -115,6 +115,8 @@ export function buildNewSite(request: CreateSiteRequest, existingCount: number, 
     createdAt: now,
     updatedAt: now,
     isDeleted: false,
+    isValid: null,
+    lastCheckedAt: null,
   }
 }
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Search, Plus, Upload, LayoutGrid, Columns3, Folder } from 'lucide-vue-next'
+import { Search, Plus, Upload, LayoutGrid, Columns3, Folder, Link2Off } from 'lucide-vue-next'
 import { useCabinStore } from '@/stores/cabin'
 import { openCreateTab, openImport } from '@/composables/ui'
 
@@ -43,6 +43,14 @@ function toggleLayout() {
       </button>
       <button class="action-btn" @click="openImport()">
         <Upload :size="14" /> 批量导入
+      </button>
+      <button
+        class="action-btn"
+        :class="{ 'broken-active': store.showOnlyBroken }"
+        :title="store.showOnlyBroken ? '显示全部网站' : '仅显示失效链接（先在设置中运行断链检测）'"
+        @click="store.toggleShowOnlyBroken()"
+      >
+        <Link2Off :size="14" /> 仅看失效
       </button>
       <div class="layout-btn" title="切换布局">
         <button
@@ -174,6 +182,12 @@ function toggleLayout() {
   border-radius: 10px;
   overflow: hidden;
   padding: 2px;
+}
+/* 仅看失效激活态（红） */
+.action-btn.broken-active {
+  border-color: #f56c6c;
+  color: #f56c6c;
+  background: rgba(245, 108, 108, 0.12);
 }
 .layout-ic {
   display: flex;

@@ -94,7 +94,25 @@ function migrate(db: Database): void {
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS search_engines (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      url TEXT NOT NULL,
+      is_default INTEGER NOT NULL DEFAULT 0,
+      sort INTEGER NOT NULL DEFAULT 0,
+      is_builtin INTEGER NOT NULL DEFAULT 0,
+      disabled INTEGER NOT NULL DEFAULT 0
+    );
+    CREATE TABLE IF NOT EXISTS backups (
+      id TEXT PRIMARY KEY,
+      created_at INTEGER NOT NULL,
+      kind TEXT NOT NULL,
+      payload TEXT NOT NULL
+    );
   `)
+  // 旧库补列（断链检测结果）：列已存在时跳过
+  addColumnIfMissing(db, 'navigations', 'is_valid', 'INTEGER');
+  addColumnIfMissing(db, 'navigations', 'last_checked_at', 'INTEGER');
   const stmt = db.prepare('SELECT value FROM meta WHERE key = ?')
   stmt.bind(['schema_version'])
   let hasVersion = false
@@ -105,6 +123,23 @@ function migrate(db: Database): void {
       'schema_version',
       String(CABIN_SCHEMA_VERSION),
     ])
+    schedulePersist()
+  }
+}
+
+/** 列不存在时补列（sql.js ALTER TABLE ADD COLUMN 重复会抛错） */
+function addColumnIfMissing(db: Database, table: string, column: string, type: string): void {
+  const stmt = db.prepare(`PRAGMA table_info(${table})`)
+  let exists = false
+  while (stmt.step()) {
+    if ((stmt.getAsObject() as { name: string }).name === column) {
+      exists = true
+      break
+    }
+  }
+  stmt.free()
+  if (!exists) {
+    db.run(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`)
     schedulePersist()
   }
 }

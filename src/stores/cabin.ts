@@ -7,14 +7,27 @@ import {
   loadTabs, insertTab, updateTabRow, clearOtherDefaults, softDeleteTab,
   loadSites, insertSite, updateSiteRow, incrementClick, softDeleteSite,
   loadSettings, saveSetting, seedIfNeeded, replaceAll, migrateLegacyTabIcons,
+  updateLinkCheckResults, loadEngines, saveEngines,
+  insertBackup, listBackups, getBackup, deleteBackup,
 } from '@/db/repositories'
 import {
   buildNewTab, applyTabUpdate, exclusiveDefaultTabs, buildNewSite, applySiteUpdate,
   validateSite, isDuplicateSite, suggestFavicon, sortSites,
 } from '@/core/navCore'
 import { buildBackupEnvelope, backupFileName, validateBackupEnvelope, mergeBackup, CABIN_BACKUP_VERSION } from '@/core/backupCore'
-import type { NavTab, NavSite, AppSettings, CreateTabRequest, UpdateTabRequest, CreateSiteRequest, UpdateSiteRequest, BackupEnvelope, ImportResult } from '@/types'
+import {
+  seedEngines, normalizeEngines, ensureSingleDefault, applySetDefault,
+  applyToggleDisabled, applyRemove, availableEngines, isLocalEngine, buildSearchUrl,
+} from '@/core/engineCore'
+import { checkDeadLinks, type CheckProgress } from '@/core/linkCheckCore'
+import { makeBackupId, shouldAutoBackup, isSameDay, AUTO_BACKUP_DEBOUNCE_MS } from '@/core/backupRing'
+import type { NavTab, NavSite, AppSettings, BackupRecord, Engine, CreateTabRequest, UpdateTabRequest, CreateSiteRequest, UpdateSiteRequest, BackupEnvelope, ImportResult } from '@/types'
 import type { Database } from 'sql.js'
+
+/** 自动存档防抖定时器（模块级） */
+let autoBackupTimer: ReturnType<typeof setTimeout> | null = null
+/** 断链检测取消器 */
+let linkCheckAbort: AbortController | null = null
 
 export const useCabinStore = defineStore('cabin', {
   state: () => ({
@@ -35,6 +48,16 @@ export const useCabinStore = defineStore('cabin', {
     searchKeyword: '',
     activeFilterTabId: '', // 空串 = 全部
     systemDark: true, // 跟随系统的暗色状态（init 时挂 matchMedia 监听）
+    /** 搜索引擎列表（core 状态机管理，唯一默认） */
+    engines: [] as Engine[],
+    /** 断链检测进度 */
+    linkCheck: { running: false, total: 0, current: 0, invalidCount: 0 } as CheckProgress & {
+      running: boolean
+    },
+    /** 仅显示失效链接 */
+    showOnlyBroken: false,
+    /** 自动存档列表（新→旧） */
+    backups: [] as BackupRecord[],
   }),
 
   getters: {
@@ -44,10 +67,11 @@ export const useCabinStore = defineStore('cabin', {
     activeTab(state): NavTab | undefined {
       return this.visibleTabs.find((t) => t.id === state.activeTabId)
     },
-    /** 当前筛选 + 搜索下的站点列表（分页后） */
+    /** 当前筛选 + 搜索 + 失效过滤下的站点列表（分页后） */
     filteredSites(state): NavSite[] {
       let list = state.sites
       if (state.activeFilterTabId) list = list.filter((s) => s.tabId === state.activeFilterTabId)
+      if (state.showOnlyBroken) list = list.filter((s) => s.isValid === 0)
       const kw = state.searchKeyword.trim().toLowerCase()
       if (kw) {
         list = list.filter(
@@ -55,6 +79,15 @@ export const useCabinStore = defineStore('cabin', {
         )
       }
       return sortSites(list)
+    },
+    /** 当前生效的搜索引擎 */
+    currentEngine(state): Engine {
+      const list = availableEngines(state.engines.length ? state.engines : seedEngines())
+      return list.find((e) => e.isDefault) ?? list[0]
+    },
+    /** 可用引擎（下拉展示） */
+    availableEngineList(state): Engine[] {
+      return availableEngines(state.engines.length ? state.engines : seedEngines())
     },
     totalClicks(state): number {
       return state.sites.reduce((sum, s) => sum + s.clickCount, 0)
@@ -74,6 +107,14 @@ export const useCabinStore = defineStore('cabin', {
       this.tabs = loadTabs(this.db)
       this.sites = loadSites(this.db)
       this.settings = loadSettings(this.db)
+      // 搜索引擎：空表则按内置种子初始化
+      let engines = loadEngines(this.db)
+      if (engines.length === 0) {
+        engines = seedEngines()
+        saveEngines(this.db, engines)
+      }
+      this.engines = ensureSingleDefault(normalizeEngines(engines))
+      this.backups = listBackups(this.db)
       const defTab = this.visibleTabs.find((t) => t.isDefault)
       this.activeTabId = defTab?.id ?? this.visibleTabs[0]?.id ?? ''
       // 系统主题变化监听（跟随系统时实时切换）
@@ -118,6 +159,7 @@ export const useCabinStore = defineStore('cabin', {
         clearOtherDefaults(db, tab.id)
       }
       this.tabs = loadTabs(db)
+      this.scheduleAutoBackup()
       return tab
     },
     async updateTab(tabId: string, request: UpdateTabRequest): Promise<void> {
@@ -133,6 +175,7 @@ export const useCabinStore = defineStore('cabin', {
         this.tabs = this.tabs.map((t) => (t.id === tabId ? updated : t))
       }
       this.tabs = loadTabs(db)
+      this.scheduleAutoBackup()
     },
     async removeTab(tabId: string): Promise<void> {
       const db = this.getDbOrThrow()
@@ -142,6 +185,7 @@ export const useCabinStore = defineStore('cabin', {
         this.activeTabId = this.visibleTabs[0]?.id ?? ''
       }
       this.sites = loadSites(db)
+      this.scheduleAutoBackup()
     },
     /** 级联删除：标签及其下全部网站（墓碑软删除） */
     async removeTabCascade(tabId: string): Promise<void> {
@@ -181,6 +225,7 @@ export const useCabinStore = defineStore('cabin', {
       const site = buildNewSite(request, this.sitesOfTab(request.tabId).length)
       insertSite(db, site)
       this.sites = loadSites(db)
+      this.scheduleAutoBackup()
       return { ok: true, site }
     },
     async updateSite(siteId: string, request: UpdateSiteRequest): Promise<{ ok: boolean; msg?: string }> {
@@ -192,6 +237,7 @@ export const useCabinStore = defineStore('cabin', {
       const updated = applySiteUpdate(site, request)
       updateSiteRow(db, updated)
       this.sites = this.sites.map((s) => (s.id === siteId ? updated : s))
+      this.scheduleAutoBackup()
       return { ok: true }
     },
     async clickSite(siteId: string): Promise<void> {
@@ -205,6 +251,7 @@ export const useCabinStore = defineStore('cabin', {
       const db = this.getDbOrThrow()
       softDeleteSite(db, siteId, Date.now())
       this.sites = this.sites.filter((s) => s.id !== siteId)
+      this.scheduleAutoBackup()
     },
     async reorderSites(tabId: string, siteIds: string[]): Promise<void> {
       const db = this.getDbOrThrow()
@@ -304,6 +351,162 @@ export const useCabinStore = defineStore('cabin', {
       }
       this.sites = loadSites(db)
       return { tabsAdded: 0, sitesAdded: added, sitesSkipped: skipped }
+    },
+
+    /** ---------- 搜索引擎 ---------- */
+    persistEngines(next: Engine[]) {
+      const db = this.getDbOrThrow()
+      saveEngines(db, next)
+      this.engines = next
+    },
+    setEngineDefault(id: string): boolean {
+      const next = applySetDefault(this.engines, id)
+      if (next === this.engines) return false
+      this.persistEngines(next)
+      return true
+    },
+    /** 禁用/启用；返回转移的默认引擎名（未转移为 null） */
+    toggleEngineDisabled(id: string, disabled: boolean): string | null {
+      const { engines, transferredTo } = applyToggleDisabled(this.engines, id, disabled)
+      this.persistEngines(engines)
+      return transferredTo
+    },
+    addEngine(name: string, url: string): { ok: boolean; msg?: string } {
+      if (!name.trim()) return { ok: false, msg: '请填写引擎名称' }
+      if (!url.includes('%s') && !/^https?:\/\//.test(url)) return { ok: false, msg: 'URL 需以 http(s):// 开头' }
+      const id = `e_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
+      const maxSort = Math.max(0, ...this.engines.map((e) => e.sort))
+      const next: Engine[] = [
+        ...this.engines,
+        { id, name: name.trim(), url: url.trim(), isDefault: false, sort: maxSort + 1, isBuiltIn: false, disabled: false },
+      ]
+      this.persistEngines(ensureSingleDefault(next))
+      return { ok: true }
+    },
+    updateEngine(id: string, patch: { name?: string; url?: string }): { ok: boolean; msg?: string } {
+      const target = this.engines.find((e) => e.id === id)
+      if (!target) return { ok: false, msg: '引擎不存在' }
+      if (patch.url !== undefined && !patch.url.includes('%s') && !/^https?:\/\//.test(patch.url)) {
+        return { ok: false, msg: 'URL 需以 http(s):// 开头' }
+      }
+      const next = this.engines.map((e) =>
+        e.id === id
+          ? { ...e, name: patch.name?.trim() || e.name, url: patch.url?.trim() ?? e.url }
+          : e,
+      )
+      this.persistEngines(next)
+      return { ok: true }
+    },
+    /** 删除自定义引擎（内置返回 blocked）；返回转移的默认引擎名 */
+    removeEngine(id: string): { transferredTo: string | null; blocked: boolean } {
+      const { engines, transferredTo, blocked } = applyRemove(this.engines, id)
+      if (!blocked) this.persistEngines(engines)
+      return { transferredTo, blocked }
+    },
+    /** 搜索提交：本地引擎 → 站内过滤；其它 → 新窗口打开搜索引擎 */
+    submitSearch(query: string): boolean {
+      const q = query.trim()
+      if (!q) return false
+      const engine = this.currentEngine
+      if (isLocalEngine(engine)) {
+        this.setSearch(q)
+        return true
+      }
+      const target = buildSearchUrl(engine, q)
+      if (target) window.open(target, '_blank', 'noopener')
+      return true
+    },
+    setEngineAsActive(id: string) {
+      // 下拉选择即临时切换默认（持久化为默认，符合直觉）
+      this.setEngineDefault(id)
+    },
+
+    /** ---------- 断链检测 ---------- */
+    async startLinkCheck(): Promise<void> {
+      if (this.linkCheck.running) return
+      const db = this.getDbOrThrow()
+      linkCheckAbort = new AbortController()
+      this.linkCheck = { running: true, total: 0, current: 0, invalidCount: 0 }
+      const urls = [...new Set(this.sites.filter((s) => !s.isDeleted).map((s) => s.url))]
+      try {
+        const results = await checkDeadLinks(
+          urls,
+          (p) => {
+            this.linkCheck = { running: true, ...p }
+          },
+          linkCheckAbort.signal,
+        )
+        if (results.length > 0) {
+          updateLinkCheckResults(db, results, Date.now())
+          this.sites = loadSites(db)
+        }
+      } finally {
+        this.linkCheck = { running: false, total: 0, current: 0, invalidCount: 0 }
+        linkCheckAbort = null
+      }
+    },
+    cancelLinkCheck() {
+      linkCheckAbort?.abort()
+    },
+    toggleShowOnlyBroken() {
+      this.showOnlyBroken = !this.showOnlyBroken
+    },
+
+    /** ---------- 自动存档（版本历史） ---------- */
+    /** 数据变更后调用：5 分钟防抖触发自动存档 */
+    scheduleAutoBackup() {
+      if (autoBackupTimer) clearTimeout(autoBackupTimer)
+      autoBackupTimer = setTimeout(() => {
+        void this.captureBackup('auto')
+      }, AUTO_BACKUP_DEBOUNCE_MS)
+    },
+    /** 立即存档；auto 档受「同日去重 + 防抖窗口」限制，返回是否实际存入 */
+    async captureBackup(kind: 'auto' | 'manual'): Promise<boolean> {
+      const db = this.getDbOrThrow()
+      const now = Date.now()
+      if (kind === 'auto') {
+        const lastAuto = this.backups.find((b) => b.kind === 'auto')
+        if (lastAuto && isSameDay(lastAuto.createdAt, now)) return false
+        if (!shouldAutoBackup(lastAuto?.createdAt ?? null, now)) return false
+      }
+      const payload = JSON.stringify({ tabs: this.visibleTabs, sites: sortSites(this.sites) })
+      const rec: BackupRecord = { id: makeBackupId(new Date(now)), createdAt: now, kind, payload }
+      insertBackup(db, rec)
+      this.backups = listBackups(db)
+      return true
+    },
+    /** 恢复存档（先自动存一份保护现场） */
+    async restoreBackup(id: string): Promise<boolean> {
+      const db = this.getDbOrThrow()
+      const rec = getBackup(db, id)
+      if (!rec) return false
+      let payload: { tabs?: unknown; sites?: unknown }
+      try {
+        payload = JSON.parse(rec.payload)
+      } catch {
+        return false
+      }
+      if (!Array.isArray(payload.tabs) || !Array.isArray(payload.sites)) return false
+      // 恢复前保护现场
+      await this.captureBackup('manual')
+      const envelope = validateBackupEnvelope({
+        app: 'Cabin',
+        version: CABIN_BACKUP_VERSION,
+        exportedAt: new Date().toISOString(),
+        tabs: payload.tabs,
+        sites: payload.sites,
+      })
+      if (!envelope) return false
+      replaceAll(db, envelope.tabs, envelope.sites)
+      this.tabs = loadTabs(db)
+      this.sites = loadSites(db)
+      this.backups = listBackups(db)
+      return true
+    },
+    async removeBackup(id: string): Promise<void> {
+      const db = this.getDbOrThrow()
+      deleteBackup(db, id)
+      this.backups = listBackups(db)
     },
 
     /** 退出前强制落盘 */

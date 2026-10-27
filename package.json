@@ -11,7 +11,9 @@
     "test:nav": "node --experimental-strip-types scripts/test-nav-core.ts",
     "test:import": "node --experimental-strip-types scripts/test-import-core.ts",
     "test:backup": "node --experimental-strip-types scripts/test-backup-core.ts",
-    "test": "npm run test:nav && npm run test:import && npm run test:backup"
+    "test:engine": "node --experimental-strip-types scripts/test-engine-core.ts",
+    "test:meta-link": "node --experimental-strip-types scripts/test-meta-link-backup.ts",
+    "test": "npm run test:nav && npm run test:import && npm run test:backup && npm run test:engine && npm run test:meta-link"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
