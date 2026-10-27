@@ -80,7 +80,8 @@ export interface UpdateSiteRequest {
 export interface AppSettings {
   theme: 'dark' | 'light'
   themeFollowSystem: boolean
-  layout: 'grid' | 'list'
+  /** 布局：grid = 卡片网格；section = 分区（每个标签一个区块，纵向堆叠） */
+  layout: 'grid' | 'section'
   pageSize: number
   wallpaperType: 'none' | 'preset' | 'custom'
   wallpaperValue: string

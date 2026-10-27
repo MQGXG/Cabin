@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useCabinStore } from '@/stores/cabin'
-import { openBackup, openSettings } from '@/composables/ui'
+import { openBackup, openSettings, openAddSite } from '@/composables/ui'
 
 const store = useCabinStore()
 const keyword = ref('')
@@ -17,7 +17,7 @@ function toggleTheme() {
     <div class="header-inner">
       <!-- 品牌 -->
       <div class="brand">
-        <span class="brand-logo">🛖</span>
+        <img class="brand-logo" src="/logo.svg" alt="Cabin" />
         <span class="brand-name">Cabin</span>
       </div>
 
@@ -29,6 +29,7 @@ function toggleTheme() {
 
       <!-- 右侧操作 -->
       <div class="header-actions">
+        <button class="icon-btn primary" title="添加网站" @click="openAddSite()">+</button>
         <button class="icon-btn" title="切换主题" @click="toggleTheme">
           {{ store.effectiveDark ? '☀️' : '🌙' }}
         </button>
@@ -40,10 +41,10 @@ function toggleTheme() {
 </template>
 
 <style scoped>
+/* 顶栏固定浅色（还原原版浅灰顶栏 + 深色内容区的双色调布局） */
 .app-header {
-  background: var(--c-header-bg);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--c-border);
+  background: #f2f4f8;
+  border-bottom: 1px solid rgba(30, 40, 70, 0.08);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -63,14 +64,15 @@ function toggleTheme() {
   user-select: none;
 }
 .brand-logo {
-  font-size: 26px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
 }
 .brand-name {
   font-size: 21px;
   font-weight: 800;
   letter-spacing: 0.5px;
-  color: var(--c-primary);
+  color: #16a06a;
 }
 .search-wrap {
   flex: 1;
@@ -79,13 +81,13 @@ function toggleTheme() {
   position: relative;
   display: flex;
   align-items: center;
-  background: var(--c-bg-soft);
-  border: 1px solid var(--c-border);
+  background: #fff;
+  border: 1px solid rgba(30, 40, 70, 0.1);
   border-radius: 999px;
   padding: 8px 18px;
 }
 .search-icon {
-  color: var(--c-text-dim);
+  color: #8a94a8;
   margin-right: 10px;
   font-size: 14px;
 }
@@ -94,11 +96,11 @@ function toggleTheme() {
   background: transparent;
   border: none;
   outline: none;
-  color: var(--c-text);
+  color: #22304f;
   font-size: 14px;
 }
 .search-input::placeholder {
-  color: var(--c-text-dim);
+  color: #8a94a8;
 }
 .header-actions {
   display: flex;
@@ -106,12 +108,13 @@ function toggleTheme() {
   gap: 10px;
 }
 .icon-btn {
-  width: 38px;
   height: 38px;
+  min-width: 38px;
+  padding: 0 8px;
   border-radius: 10px;
-  border: 1px solid var(--c-border);
-  background: var(--c-bg-soft);
-  color: var(--c-text);
+  border: 1px solid rgba(30, 40, 70, 0.1);
+  background: #fff;
+  color: #3a4763;
   cursor: pointer;
   font-size: 16px;
   transition: all 0.2s;
@@ -120,8 +123,21 @@ function toggleTheme() {
   justify-content: center;
 }
 .icon-btn:hover {
-  border-color: var(--c-primary);
-  background: var(--c-primary-soft);
+  border-color: #16a06a;
+  background: rgba(34, 197, 139, 0.1);
+}
+/* 主题主色按钮（+ 添加网站） */
+.icon-btn.primary {
+  background: #22c58b;
+  border-color: #22c58b;
+  color: #fff;
+  font-weight: 800;
+  font-size: 20px;
+  padding: 0 12px;
+  box-shadow: 0 4px 12px rgba(34, 197, 139, 0.35);
+}
+.icon-btn.primary:hover {
+  background: #1fb37f;
 }
 @media (max-width: 720px) {
   .header-inner {

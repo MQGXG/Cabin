@@ -56,6 +56,9 @@ ok(!isDuplicateSite([b], 't1', 'https://example.com/'), '已删除站点不参�
 console.log('[suggestFavicon]')
 ok(suggestFavicon('https://www.cnblogs.com/').includes('favicon.im/cnblogs.com'), '生成 favicon.im 服务地址')
 ok(suggestFavicon('http://hello world') === '', '非法 URL 返回空')
+ok(suggestFavicon('http://192.168.1.8/') === '', '内网 IPv4 不请求 favicon 服务')
+ok(suggestFavicon('http://0.0.4.187:8080/') === '', 'IP:端口 不请求 favicon 服务')
+ok(suggestFavicon('http://localhost:5173/') === '', 'localhost 不请求 favicon 服务')
 
 if (failed > 0) {
   console.error(`\n共 ${failed} 个断言失败`)

@@ -143,7 +143,8 @@ function applySetting(settings: AppSettings, key: string, value: string): void {
       settings.themeFollowSystem = value === '1' || value === 'true'
       break
     case 'layout':
-      if (value === 'grid' || value === 'list') settings.layout = value
+      if (value === 'grid' || value === 'section') settings.layout = value
+      else if (value === 'list') settings.layout = 'grid' // 旧版"列表"映射回网格
       break
     case 'pageSize':
       settings.pageSize = Number(value) || 18

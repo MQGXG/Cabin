@@ -143,14 +143,23 @@ export function isDuplicateSite(existing: NavSite[], tabId: string, url: string)
   })
 }
 
+/** 判断主机名是否为 IP 字面量 / localhost（内网地址不请求 favicon 服务） */
+export function isLocalHost(host: string): boolean {
+  if (!host) return true
+  if (host === 'localhost') return true
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(host)) return true // IPv4
+  if (host.includes(':')) return true // IPv6
+  return false
+}
+
 /** 推荐 favicon 地址（在线服务，离线时优雅降级到占位图标） */
 export function suggestFavicon(url: string): string {
-  let domain: string
+  let host: string
   try {
-    domain = new URL(normalizeUrl(url)).hostname.replace(/^www\./, '')
+    host = new URL(normalizeUrl(url)).hostname.replace(/^www\./, '')
   } catch {
     return ''
   }
-  if (!domain) return ''
-  return `https://favicon.im/${domain}?larger=true`
+  if (isLocalHost(host)) return ''
+  return `https://favicon.im/${host}?larger=true`
 }

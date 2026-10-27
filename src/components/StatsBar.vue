@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useCabinStore } from '@/stores/cabin'
 import { openCreateTab, openImport } from '@/composables/ui'
 
@@ -15,10 +15,8 @@ watch(
 const keyword = ref('')
 watch(keyword, (v) => store.setSearch(v))
 
-const layoutIcon = computed(() => (store.settings.layout === 'grid' ? '▦' : '☰'))
-
 function toggleLayout() {
-  void store.patchSetting('layout', store.settings.layout === 'grid' ? 'list' : 'grid')
+  void store.patchSetting('layout', store.settings.layout === 'grid' ? 'section' : 'grid')
 }
 </script>
 
@@ -43,9 +41,28 @@ function toggleLayout() {
         <span class="plus">+</span> 创建标签
       </button>
       <button class="action-btn" @click="openImport()">📥 批量导入</button>
-      <button class="layout-btn" :title="layoutIcon === '▦' ? '切换为列表' : '切换为网格'" @click="toggleLayout">
-        <span :class="{ active: store.settings.layout === 'grid' }">▦</span>
-        <span :class="{ active: store.settings.layout === 'list' }">☰</span>
+      <button class="layout-btn" title="切换布局" @click="toggleLayout">
+        <!-- 网格布局图标 -->
+        <svg
+          class="layout-ic"
+          :class="{ active: store.settings.layout === 'grid' }"
+          width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"
+        >
+          <rect x="1" y="1" width="6" height="6" rx="1.4" />
+          <rect x="9" y="1" width="6" height="6" rx="1.4" />
+          <rect x="1" y="9" width="6" height="6" rx="1.4" />
+          <rect x="9" y="9" width="6" height="6" rx="1.4" />
+        </svg>
+        <!-- 分区布局图标 -->
+        <svg
+          class="layout-ic"
+          :class="{ active: store.settings.layout === 'section' }"
+          width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"
+        >
+          <rect x="1" y="1.5" width="14" height="3" rx="1.2" />
+          <rect x="1" y="7" width="6" height="7.5" rx="1.4" />
+          <rect x="9" y="7" width="6" height="7.5" rx="1.4" />
+        </svg>
       </button>
     </div>
   </div>
@@ -139,19 +156,23 @@ function toggleLayout() {
 }
 .layout-btn {
   display: flex;
+  align-items: center;
+  gap: 2px;
   background: var(--c-bg-soft);
   border: 1px solid var(--c-border);
   border-radius: 10px;
   overflow: hidden;
+  padding: 2px;
 }
-.layout-btn span {
-  padding: 8px 12px;
+.layout-ic {
+  padding: 6px 9px;
+  box-sizing: content-box;
   cursor: pointer;
   color: var(--c-text-dim);
-  font-size: 14px;
+  border-radius: 8px;
   transition: all 0.2s;
 }
-.layout-btn span.active {
+.layout-ic.active {
   background: var(--c-primary-soft);
   color: var(--c-primary);
 }
