@@ -1,0 +1,165 @@
+/**
+ * Markdown 正文排版（全局共享）
+ * 作用于 .md-body 容器内的渲染结果：博客详情页 / 编辑器预览区 / 静态导出参考
+ * 全部走主题变量，暗/亮双主题自适应
+ */
+
+.md-body {
+  font-size: 15.5px;
+  line-height: 1.9;
+  color: var(--c-text);
+  word-wrap: break-word;
+}
+
+/* 标题层级 */
+.md-body h1,
+.md-body h2,
+.md-body h3,
+.md-body h4 {
+  color: var(--c-text);
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 1.7em 0 0.7em;
+}
+.md-body h1 {
+  font-size: 1.65em;
+  padding-bottom: 0.35em;
+  border-bottom: 1px solid var(--c-border);
+}
+.md-body h2 {
+  font-size: 1.4em;
+}
+.md-body h3 {
+  font-size: 1.18em;
+}
+.md-body h4 {
+  font-size: 1.02em;
+}
+.md-body h1:first-child,
+.md-body h2:first-child,
+.md-body h3:first-child {
+  margin-top: 0;
+}
+
+/* 段落与列表 */
+.md-body p {
+  margin: 0.9em 0;
+}
+.md-body ul,
+.md-body ol {
+  padding-left: 1.7em;
+  margin: 0.9em 0;
+}
+.md-body li {
+  margin: 0.35em 0;
+}
+.md-body li > ul,
+.md-body li > ol {
+  margin: 0.25em 0;
+}
+
+/* 引用 */
+.md-body blockquote {
+  margin: 1.1em 0;
+  padding: 0.6em 1.1em;
+  border-left: 3px solid var(--c-primary);
+  background: color-mix(in srgb, var(--c-primary) 7%, transparent);
+  border-radius: 0 8px 8px 0;
+  color: var(--c-text-dim);
+}
+.md-body blockquote p {
+  margin: 0.4em 0;
+}
+
+/* 行内代码与代码块 */
+.md-body code {
+  font-family: 'SFMono-Regular', Consolas, 'Courier New', monospace;
+  font-size: 0.88em;
+  background: color-mix(in srgb, var(--c-text) 10%, transparent);
+  color: var(--c-primary);
+  border-radius: 5px;
+  padding: 0.15em 0.45em;
+}
+.md-body pre {
+  background: color-mix(in srgb, var(--c-bg) 80%, black);
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 1.1em 0;
+  line-height: 1.65;
+}
+.md-body pre code {
+  background: transparent;
+  color: var(--c-text);
+  padding: 0;
+  font-size: 0.86em;
+  border-radius: 0;
+}
+
+/* 链接与强调 */
+.md-body a {
+  color: var(--c-primary);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--c-primary) 40%, transparent);
+  transition: border-color 0.15s;
+}
+.md-body a:hover {
+  border-bottom-color: var(--c-primary);
+}
+.md-body strong {
+  font-weight: 700;
+  color: var(--c-text);
+}
+.md-body em {
+  font-style: italic;
+}
+.md-body del {
+  color: var(--c-text-dim);
+}
+
+/* 分隔线 */
+.md-body hr {
+  border: none;
+  border-top: 1px solid var(--c-border);
+  margin: 1.8em 0;
+}
+
+/* 表格 */
+.md-body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.1em 0;
+  font-size: 0.92em;
+  display: block;
+  overflow-x: auto;
+}
+.md-body th,
+.md-body td {
+  border: 1px solid var(--c-border);
+  padding: 8px 12px;
+  text-align: left;
+}
+.md-body th {
+  background: color-mix(in srgb, var(--c-text) 7%, transparent);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.md-body tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--c-text) 3%, transparent);
+}
+
+/* 图片 */
+.md-body img {
+  max-width: 100%;
+  border-radius: 10px;
+  margin: 0.6em 0;
+}
+
+/* 首尾间距收口 */
+.md-body > :first-child {
+  margin-top: 0;
+}
+.md-body > :last-child {
+  margin-bottom: 0;
+}
