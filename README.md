@@ -52,8 +52,73 @@ npm run build      # 构建 dist/（sql-wasm.wasm 已内联为 data URL）
 npm run preview    # 预览构建产物
 ```
 
-> 构建产物 `dist/` 可部署到**任意静态服务器**（Nginx / GitHub Pages / PM2 serve）。首次打开自动建库并种子默认标签与内置搜索引擎。
+> 构建产物 `dist/` 是**纯静态文件**（sql-wasm.wasm 已内联）。首次打开自动建库并种子默认标签与内置搜索引擎。
 > 进入博客：顶栏右侧 **📖** 按钮；博客内「管理」进入后台。
+
+---
+
+## 🖥️ 本地使用
+
+| 方式 | 命令 | 说明 |
+|------|------|------|
+| 开发模式 | `npm run dev` | 热更新 http://localhost:5173 |
+| 本地生产预览 | `npm run build` → `npm run preview` | 与线上一致的构建产物 |
+| 任意静态服务器 | 构建后托管 `dist/` | `npx serve dist` / Python `http.server` / IIS 均可 |
+
+> ⚠️ **不能直接双击 `index.html`**：`file://` 协议下浏览器会拦截 ES module 加载（CORS），必须通过 HTTP 服务访问。
+
+---
+
+## 🌐 私人部署（纯静态，零后端）
+
+Cabin 没有任何服务端依赖——部署 = 把 `dist/` 放到任意静态托管处，数据库仍在访问者的浏览器里。
+
+### 方式一：自有服务器 Nginx（宝塔 / 1Panel 同理）
+
+```bash
+npm run build
+scp -r dist/* user@your-server:/var/www/cabin/
+```
+
+```nginx
+server {
+  listen 443 ssl;
+  server_name cabin.your-domain.com;
+  root /var/www/cabin;
+  index index.html;
+
+  # SPA 回退
+  location / { try_files $uri $uri/ /index.html; }
+}
+```
+
+面板部署：新建**纯静态站点**指向 `dist/` 目录即可，无需任何后端运行环境。
+
+### 方式二：托管平台（零运维）
+
+| 平台 | 配置 |
+|------|------|
+| GitHub Pages | Settings → Pages 选择分支即可（静态直出） |
+| Vercel / Netlify / Cloudflare Pages | 导入仓库自动识别 Vite：Build `npm run build`，Output `dist` |
+
+### 方式三：Docker（NAS / 家庭服务器）
+
+```dockerfile
+FROM nginx:alpine
+COPY dist/ /usr/share/nginx/html/
+EXPOSE 80
+```
+
+```bash
+docker build -t cabin . && docker run -d -p 8080:80 cabin
+```
+
+### 部署须知
+
+- **数据仍在浏览器里**：服务器只托管静态代码；每个访问者（含你自己换浏览器）的数据存在各自的 IndexedDB，设备之间**不互通**
+- **换设备迁移**：旧设备「备份 / 恢复」→ 导出 `.db` 或 JSON → 新设备导入
+- **建议 HTTPS**：https 页面下 IndexedDB、剪贴板等浏览器 API 权限更稳定，favicon / 元数据等公共 HTTPS 服务也更顺畅
+- 断链检测、自动抓标题、favicon 均由你的浏览器**直接**访问公共服务，**不经过你的服务器**
 
 ## 📸 更多截图
 
